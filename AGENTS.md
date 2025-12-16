@@ -2,23 +2,24 @@
 
 ## Repository Context
 **Purpose**: AI agent definitions & research documentation repository for Kiogreo ecosystem. Documentation-only - no traditional source code.
-**Structure**: `.claude/agents/` (Claude agents), `.opencode/agent/` (OpenCode agents), `.output/` (temp AI outputs), `.lab/` (research WIP), `.library/` (final research docs)
+**Structure**: `.claude/agents/` (Claude agents), `.opencode/agent/` (OpenCode agents), `.output/` (temp AI outputs), `test/` (prototypes & WIP), `library/` (final research docs)
 **Tech Stack**: OpenCode, Claude Code, other AI coding agents
+**Config**: Default model `anthropic/claude-sonnet-4-5` in `opencode.jsonc`
 
 ## Build/Test Commands
-- **Install**: `bun install` (`.opencode/` directory only)
+- **Install**: `cd .opencode && bun install`
 - **Build/Lint/Test**: None - this is a documentation repository
 - **Single Test**: N/A - validation happens through agent execution in target environments
 - **Verification**: Manual review + testing agents in real usage scenarios
 
 ## Agent Definition Standards
-- **Location**: `.claude/agents/*.md` (Claude agents) or `.opencode/agent/*.md` (OpenCode agents) or `.opencode/command/*.md` (commands)
-- **Format**: Markdown with YAML frontmatter - see `.opencode/agent/technical-documentation-processor.md` for reference
-- **Required YAML**: `name`, `description`, `model` (always use `anthropic/claude-sonnet-4-5`)
-- **Optional YAML**: `identifier`, `mode: subagent`, `tools`, `permission` (ask/allow/deny)
-- **File Naming**: kebab-case (e.g., `readme-writer.md`, `analyze-web-docs.md`)
-- **Content Structure**: System Prompt → Instructions → Core Responsibilities → Strategy → Output Format → Guidelines
-- **Examples**: Must include `<example>` tags demonstrating usage scenarios
+- **Location**: `.claude/agents/*.md` (Claude agents) or `.opencode/agent/*.md` (OpenCode agents)
+- **Format**: Markdown with YAML frontmatter + agent instructions
+- **Required YAML**: `description` (include usage examples), `mode: subagent`, optionally `tools` (dict of tool permissions)
+- **Model**: Always use `anthropic/claude-sonnet-4-5` (configured in `opencode.jsonc`)
+- **File Naming**: kebab-case (e.g., `doc-processor.md`, `readme-writer.md`)
+- **Content Structure**: Agent role statement → Core Responsibilities → Output Structure → Quality Standards → Process Workflow
+- **Usage Examples**: Include in YAML `description` field with User/Assistant dialogue format
 
 ## Code Style (for future TypeScript/JavaScript development)
 - **Imports**: stdlib → third-party → local (grouped and ordered alphabetically within groups)
@@ -28,6 +29,6 @@
 - **Comments**: Explain "why" not "what"; maintain single responsibility per agent/function
 
 ## Pull Request Guidelines
-- **Templates**: Use `.github/PULL_REQUEST_TEMPLATE/feature.md` (new features) or `bugfix.md` (bug fixes)
-- **Agent Checklist**: Complete YAML frontmatter, usage examples, clear objectives, QA section
-- **Review Priorities**: Readability → Maintainability → Performance
+- **Template**: Use `.github/pull_request_template.md` (specify feature type: New Agent/Enhancement/Documentation/Infrastructure)
+- **Agent Checklist**: Complete YAML frontmatter with examples, clear role definition, structured workflow
+- **Review Priorities**: Clarity of purpose → Completeness → Usability → Consistency with existing agents

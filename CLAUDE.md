@@ -9,9 +9,9 @@ This is an AI agent definitions and research documentation repository for the Ki
 **Key Directories:**
 - `.opencode/agent/` - OpenCode agent definitions (Markdown with YAML frontmatter)
 - `.claude/agents/` - Claude Code agent definitions
-- `.output/` - Temporary directory for AI agent outputs (used as medium for multi-agent workflows)
-- `.lab/` - Semi-temporary directory for research work-in-progress
-- `.library/` - Final curated research documentation and knowledge bases
+- `lab/.output/` - Temporary directory for AI agent outputs (used as medium for multi-agent workflows)
+- `lab/` - Semi-temporary directory for research work-in-progress
+- `library/` - Final curated research documentation and knowledge bases
 
 ## Development Commands
 
@@ -84,7 +84,7 @@ Claude Code agents follow a similar Markdown + YAML structure:
 
 ## Research Output Format
 
-When AI agents generate research documentation, they should use the `.output/` directory with this naming convention:
+When AI agents generate research documentation, they should use the `lab/.output/` directory with this naming convention:
 - `{context}-doc.process.md` - For processed documentation outputs
 - Include YAML frontmatter with metadata (title, source, processed_date, tags)
 - Structure content for RAG optimization with clear heading hierarchy
@@ -92,11 +92,9 @@ When AI agents generate research documentation, they should use the `.output/` d
 
 ## Pull Request Guidelines
 
-Use the appropriate PR template:
-- **New Features:** `.github/PULL_REQUEST_TEMPLATE/feature.md`
-- **Bug Fixes:** `.github/PULL_REQUEST_TEMPLATE/bugfix.md`
+Use the PR template at `.github/pull_request_template.md`.
 
-**For Agent PRs, complete the Agent-Specific Checklist:**
+**For Agent PRs, complete the checklist:**
 - YAML frontmatter complete with all required fields
 - Usage examples included in description or content
 - Clear objectives defined
@@ -111,16 +109,16 @@ Use the appropriate PR template:
 
 ### Multi-Agent Workflows
 
-The `.output/` directory serves as a communication medium between agents:
-1. Agent A processes input → writes to `.output/{context}-doc.process.md`
-2. Agent B reads from `.output/` → performs additional processing
-3. Final curated output moves to `.library/`
+The `lab/.output/` directory serves as a communication medium between agents:
+1. Agent A processes input → writes to `lab/.output/{context}-doc.process.md`
+2. Agent B reads from `lab/.output/` → performs additional processing
+3. Final curated output moves to `library/`
 
 ### Knowledge Base Curation
 
-1. Raw research/outputs → `.output/` (temporary)
-2. Work in progress → `.lab/` (semi-temporary)
-3. Verified knowledge → `.library/` (permanent)
+1. Raw research/outputs → `lab/.output/` (temporary)
+2. Work in progress → `lab/` (semi-temporary)
+3. Verified knowledge → `library/` (permanent)
 
 ## Code Style Guidelines
 

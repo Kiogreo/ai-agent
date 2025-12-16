@@ -1,20 +1,20 @@
-## Type
-- [ ] Feature
-- [ ] Bugfix
-- [ ] Documentation
+# {PULL_REQUEST_TITLE}
 
-<!-- For more detailed templates, see: -->
-<!-- Feature PR: ?template=feature.md -->
-<!-- Bugfix PR: ?template=bugfix.md -->
+## Feature Type
+
+- [ ] New Agent
+- [ ] Agent Enhancement
+- [ ] Documentation
+- [ ] Infrastructure
 
 ## Description
-<!-- Brief summary of what and why -->
 
-## Changes
-<!-- List key changes -->
--
+<!-- Brief description: What is this feature and why is it needed? (1-2 sentences) -->
 
-## Code Quality Verification
-- [ ] Code is readable and self-documenting
-- [ ] Changes are maintainable and follow existing patterns
-- [ ] No obvious performance issues
+## Test Summary (optional)
+
+<!-- Show how user can make use of this new feature -->
+
+## Screenshot (optional)
+
+<!-- Some screenshot to further explain or as a complimentatry document -->
