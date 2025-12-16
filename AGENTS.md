@@ -2,7 +2,7 @@
 
 ## Repository Context
 **Purpose**: AI agent definitions & research documentation repository for Kiogreo ecosystem. Documentation-only - no traditional source code.
-**Structure**: `.opencode/agent/` (agent definitions), `.output/` (temp AI outputs), `.lab/` (research WIP), `.library/` (final research docs)
+**Structure**: `.claude/agents/` (Claude agents), `.opencode/agent/` (OpenCode agents), `.output/` (temp AI outputs), `.lab/` (research WIP), `.library/` (final research docs)
 **Tech Stack**: OpenCode, Claude Code, other AI coding agents
 
 ## Build/Test Commands
@@ -12,7 +12,7 @@
 - **Verification**: Manual review + testing agents in real usage scenarios
 
 ## Agent Definition Standards
-- **Location**: `.opencode/agent/*.md` (agents) or `.opencode/command/*.md` (commands)
+- **Location**: `.claude/agents/*.md` (Claude agents) or `.opencode/agent/*.md` (OpenCode agents) or `.opencode/command/*.md` (commands)
 - **Format**: Markdown with YAML frontmatter - see `.opencode/agent/technical-documentation-processor.md` for reference
 - **Required YAML**: `name`, `description`, `model` (always use `anthropic/claude-sonnet-4-5`)
 - **Optional YAML**: `identifier`, `mode: subagent`, `tools`, `permission` (ask/allow/deny)
