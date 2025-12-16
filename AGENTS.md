@@ -29,6 +29,6 @@
 - **Comments**: Explain "why" not "what"; maintain single responsibility per agent/function
 
 ## Pull Request Guidelines
-- **Template**: Use `.github/pull_request_template.md` (specify feature type: New Agent/Enhancement/Documentation/Infrastructure)
-- **Agent Checklist**: Complete YAML frontmatter with examples, clear role definition, structured workflow
-- **Review Priorities**: Clarity of purpose → Completeness → Usability → Consistency with existing agents
+- **Templates**: Use `.github/PULL_REQUEST_TEMPLATE/feature.md` (new features) or `bugfix.md` (bug fixes)
+- **Agent Checklist**: Complete YAML frontmatter, usage examples, clear objectives, QA section
+- **Review Priorities**: Readability → Maintainability → Performance
