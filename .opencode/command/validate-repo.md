@@ -1,6 +1,6 @@
 # Validate Repository
 
-Comprehensive validation command that checks the entire OpenAgents repository for consistency between CLI, documentation, registry, and components.
+Comprehensive validation command that checks the entire OpenAgents repository for consistency between CLI, documentation, and components.
 
 ## Usage
 
@@ -8,47 +8,53 @@ Comprehensive validation command that checks the entire OpenAgents repository fo
 /validate-repo
 ```
 
+## Important Note
+
+This command supports **two validation modes**:
+
+1. **Source Repository Mode** (current): File-based validation for development/source repositories without registry.json
+2. **Installed Framework Mode**: Full registry-based validation for installed OpenAgents frameworks with registry.json
+
+The command automatically detects which mode to use based on the presence of `.opencode/registry.json`.
+
 ## What It Checks
 
-This command performs a comprehensive validation of:
+### Source Repository Mode (when registry.json is missing)
 
-1. **Registry Integrity**
-   - JSON syntax validation
-   - Component definitions completeness
-   - File path references
-   - Dependency declarations
+1. **File Structure Integrity**
+   - All required directories exist
+   - Component files are properly organized
+   - Configuration files are present
 
 2. **Component Existence**
    - All agents exist at specified paths
    - All subagents exist at specified paths
    - All commands exist at specified paths
-   - All tools exist at specified paths
-   - All plugins exist at specified paths
    - All context files exist at specified paths
-   - All config files exist at specified paths
+   - Tool and plugin implementations exist
 
-3. **Profile Consistency**
-   - Component counts match documentation
-   - Profile descriptions are accurate
-   - Dependencies are satisfied
-   - No duplicate components
+3. **Documentation Accuracy**
+   - README component counts match actual files
+   - Context file references in agents are valid
+   - Documentation structure is consistent
 
-4. **Documentation Accuracy**
-   - README component counts match registry
-   - OpenAgent documentation references are valid
-   - Context file references are correct
-   - Installation guide is up to date
+4. **Configuration Integrity**
+   - OpenCode configuration is valid
+   - Environment files are properly set up
+   - Security checks (hardcoded credentials)
 
-5. **Context File Structure**
-   - All referenced context files exist
-   - Context file organization is correct
-   - No orphaned context files
+5. **Cross-References**
+   - Context file references in agents exist
+   - Command documentation is complete
+   - Component dependencies are satisfied
 
-6. **Cross-References**
-   - Agent dependencies exist
-   - Subagent references are valid
-   - Command references are valid
-   - Tool dependencies are satisfied
+### Installed Framework Mode (when registry.json exists)
+
+Performs comprehensive registry-based validation including:
+- Registry JSON validation
+- Component definition completeness
+- Profile consistency
+- All checks from Source Repository Mode
 
 ## Output
 
@@ -62,17 +68,58 @@ The command generates a detailed report showing:
 
 You are a validation specialist. Your task is to comprehensively validate the OpenAgents repository for consistency and correctness.
 
-### Step 1: Validate Registry JSON
+### Step 1: Detect Repository Type
 
-1. Read and parse `registry.json`
-2. Validate JSON syntax
-3. Check schema structure:
-   - `version` field exists
-   - `repository` field exists
-   - `categories` object exists
-   - `components` object exists with all types
-   - `profiles` object exists
-   - `metadata` object exists
+1. Check if `.opencode/registry.json` exists
+2. If exists → Use **Installed Framework Mode** (skip to Step 3)
+3. If missing → Use **Source Repository Mode** (continue to Step 2)
+
+### Step 2: Source Repository Validation (No registry.json)
+
+#### 2.1 Validate Directory Structure
+1. Check all required directories exist:
+   - `.opencode/agent/` (with subdirectories)
+   - `.opencode/command/`
+   - `.opencode/context/`
+   - `.opencode/tool/` (optional)
+   - `.opencode/plugin/` (optional)
+
+#### 2.2 Validate Component Files
+1. **Agents**: List all `.md` files in agent directories
+2. **Commands**: List all `.md` files in command directory
+3. **Context**: List all `.md` files in context directory
+4. **Tools**: List implementation files (TypeScript/JavaScript)
+5. **Plugins**: List implementation files (TypeScript/JavaScript)
+
+#### 2.3 Validate Configuration
+1. Check `opencode.jsonc` exists and has valid JSONC syntax
+2. Check `.opencode/package.json` exists
+3. Check `.opencode/env.example` exists
+4. Validate `.env` exists but is in .gitignore
+
+#### 2.4 Security Checks
+1. Scan configuration files for hardcoded API keys
+2. Check if secrets are properly using environment variables
+3. Verify `.env` files are gitignored
+
+#### 2.5 Cross-Reference Validation
+1. Read all agent files
+2. Extract context file references
+3. Verify all referenced context files exist
+4. Check for broken references
+
+### Step 3: Installed Framework Validation (With registry.json)
+
+3.1 **Validate Registry JSON**
+   1. Read and parse `registry.json`
+   2. Validate JSON syntax
+   3. Check schema structure:
+      - `version` field exists
+      - `repository` field exists
+      - `categories` object exists
+      - `components` object exists with all types
+      - `profiles` object exists
+      - `metadata` object exists
 
 ### Step 2: Validate Component Definitions
 

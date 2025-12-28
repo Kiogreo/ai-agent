@@ -7,12 +7,16 @@
 **Tech Stack**: Node.js/JavaScript, Trello API, GitHub Actions, OpenCode CLI, MCP (Model Context Protocol)
 **Config**: Default model `anthropic/claude-sonnet-4-5` in `opencode.jsonc`
 
+## ⚠️ Security Alert
+**CRITICAL**: Hardcoded Trello API credentials found in `opencode.jsonc`. These must be moved to environment variables immediately.
+
 ## Build/Test Commands
 
 ### Trello Automation (Root Level)
 - **Install**: No package.json at root - automation uses GitHub Actions runtime
 - **Local Setup**: Create `.env` file with `TRELLO_API_KEY` and `TRELLO_TOKEN`
-- **Test Locally**: N/A - scripts run via GitHub Actions workflow
+- **Test Locally**: `npm test` (dry-run mode - simulates without creating cards)
+- **Run Production**: `npm start` (creates actual Trello cards)
 - **Manual Trigger**: GitHub Actions → "Trello Bills Automation" → "Run workflow"
 - **View Logs**: GitHub Actions → Select workflow run → "create-bills-cards" job
 - **Schedule**: Daily at 1:00 AM UTC (configured in `.github/workflows/trello-automation.yml`)
@@ -23,6 +27,12 @@
 - **Development**: `opencode --agent opencoder` (complex coding tasks)
 - **Commands**: `/commit`, `/test`, `/optimize`, `/clean`, `/context`
 - **Validation**: Manual review + testing agents in real usage scenarios
+
+### Testing Commands
+- **Single Test Run**: No individual test files - use `npm test` for dry-run validation
+- **Full Test Suite**: `npm test` (dry-run) or manual GitHub Actions trigger
+- **Type Check**: No dedicated type checking configured
+- **Lint**: No linting configured at root level
 
 ## Trello Automation Standards
 
@@ -46,16 +56,26 @@
 
 ## Code Style Guidelines
 
+### Core Philosophy
+**Modular, Functional, Maintainable**: Pure functions, immutability, composition over inheritance. Golden rule: "If you can't easily test it, refactor it."
+
 ### JavaScript/Node.js Conventions
 - **Imports**: Node.js built-ins → third-party packages → local modules (alphabetically within groups)
-- **Naming**: 
+- **Naming**:
   - Files: `kebab-case.js` (e.g., `create-bills-cards.js`)
-  - Variables/Functions: `camelCase` (e.g., `calculateDueDate`, `createCard`)
+  - Functions: `verbPhrases` (e.g., `calculateDueDate`, `validateEmail`)
+  - Variables: `descriptiveCamelCase` (e.g., `userCount`, `isValidEmail`)
   - Constants: `UPPER_SNAKE_CASE` (e.g., `TRELLO_API_KEY`, `DRY_RUN`)
   - Classes: `PascalCase` (e.g., `TrelloClient`, `CardBuilder`)
-- **Functions**: Pure functions preferred - same input = same output, no side effects
+- **Functions**: Pure functions preferred (< 50 lines) - same input = same output, no side effects
 - **Async/Await**: Use async/await over promises for readability
 - **Error Handling**: Try/catch with specific error types, meaningful messages with context
+
+### Functional Programming Patterns
+- **Pure Functions**: Same input = same output, no side effects
+- **Immutability**: Create new data, don't modify existing (`[...items, item]` not `items.push(item)`)
+- **Composition**: Build complex from simple functions (`pipe(validate, enrich, save)`)
+- **Declarative**: Describe what, not how (`users.filter(u => u.active).map(u => u.name)`)
 
 ### Security Best Practices
 - **Secrets**: ALWAYS use environment variables - NEVER commit credentials
@@ -65,16 +85,18 @@
 - **Logging**: NEVER log sensitive data (tokens, API keys, passwords)
 
 ### Code Structure
-- **Modularity**: Single responsibility per function (< 50 lines ideal)
+- **Modularity**: Single responsibility per component (< 100 lines, ideally < 50)
 - **Pure Functions**: Avoid side effects, return new data instead of mutating
+- **Dependency Injection**: Pass dependencies explicitly, no hidden globals
 - **Comments**: Explain "why" not "what" - focus on business logic and decisions
 - **Error Messages**: Actionable and specific (e.g., "Template card 'Monthly Bills' not found in TEMPLATE list")
 
-### Testing Patterns
-- **Dry Run**: Test mode that simulates operations without API calls
-- **Logging**: Detailed logs for debugging (card names, dates, API responses)
-- **Validation**: Check config before execution, fail fast on invalid data
-- **Manual Testing**: Trigger workflows manually before relying on schedule
+### Testing Standards
+- **AAA Pattern**: Arrange → Act → Assert (one assertion per test)
+- **Coverage Goals**: Critical logic (100%), public APIs (90%+), utilities (80%+)
+- **Test Behavior**: Focus on what code does, not implementation details
+- **Mock Dependencies**: Use dependency injection for testable code
+- **Edge Cases**: Test happy path, boundaries, errors, and invalid inputs
 
 ## OpenAgents Framework Standards
 
@@ -106,20 +128,17 @@
 - **Common Commands**: `/commit` (smart commits), `/test`, `/optimize`, `/clean`, `/context`
 - **Custom Commands**: Create new commands following existing patterns
 
-## GitHub Actions Workflow
+## Context Loading (Agents)
+```markdown
+# Agents automatically load context before execution:
+- Code tasks → .opencode/context/core/standards/code.md
+- Docs tasks → .opencode/context/core/standards/docs.md
+- Tests tasks → .opencode/context/core/standards/tests.md
+- Review tasks → .opencode/context/core/workflows/review.md
+- Delegation → .opencode/context/core/workflows/delegation.md
+```
 
-### Automation Workflow
-- **File**: `.github/workflows/trello-automation.yml`
-- **Trigger**: Scheduled (cron) + manual dispatch
-- **Environment**: GitHub Actions runner with Node.js
-- **Secrets**: `TRELLO_API_KEY`, `TRELLO_TOKEN` stored in GitHub Secrets
-- **Logs**: Viewable in Actions tab for debugging
 
-### Workflow Best Practices
-- **Cron Syntax**: Use https://crontab.guru/ to validate schedules
-- **Manual Triggers**: Always enable `workflow_dispatch` for testing
-- **Error Handling**: Fail workflow on critical errors, warn on non-critical
-- **Notifications**: Consider adding Slack/email notifications for failures
 
 ## Pull Request Guidelines
 
@@ -135,9 +154,8 @@
 - ✅ Pure functions where possible (no unnecessary side effects)
 - ✅ Input validation for external data
 - ✅ Comments explain "why" not "what"
-- ✅ Code follows naming conventions (camelCase, kebab-case, etc.)
+- ✅ Code follows naming conventions
 - ✅ Agent YAML frontmatter complete (if agent PR)
-- ✅ Context files updated (if patterns changed)
 
 ### Review Priorities
 1. **Security**: No exposed secrets, proper input validation
@@ -160,6 +178,7 @@ opencode --agent opencoder
 /test            # Run tests
 /optimize        # Code optimization
 /clean           # Cleanup operations
+/context         # Load project context
 ```
 
 ### Common Patterns
@@ -187,19 +206,4 @@ if (!TRELLO_API_KEY) {
 }
 ```
 
-### Context Loading (Agents)
-```markdown
-# Agents automatically load context before execution:
-- Code tasks → .opencode/context/core/standards/code.md
-- Docs tasks → .opencode/context/core/standards/docs.md
-- Tests tasks → .opencode/context/core/standards/tests.md
-- Review tasks → .opencode/context/core/workflows/review.md
-```
 
-## Additional Resources
-
-- **OpenAgents README**: `.opencode/README.md` - Complete framework documentation
-- **Essential Patterns**: `.opencode/context/core/essential-patterns.md` - Core coding patterns
-- **Trello API Docs**: https://developer.atlassian.com/cloud/trello/rest/
-- **GitHub Actions Docs**: https://docs.github.com/en/actions
-- **OpenCode CLI Docs**: https://opencode.ai/docs
