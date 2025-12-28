@@ -3,4 +3,29 @@
   "theme": "matrix", // theme config
   "model": "anthropic/claude-sonnet-4-5", // default AI model
   "autoupdate": true,
+  "mcp": {
+    "trello-mcp": {
+      "enabled": true,
+      "type": "local",
+      "command": ["bunx", "@delorenj/mcp-server-trello"],
+      "environment": {
+        "TRELLO_API_KEY": "baefd14b28f8d63dac8cf31a42273575",
+        "TRELLO_TOKEN": "ATTAed70250433f528a38c4d1f769db49e0dc24ddfcb3f4ad3b52a0e6850211e675dA0D71BF7",
+        "TRELLO_WORKSPACE_ID": "5e3b72efe4a02a6cf792799f"
+      },
+    },
+    "github": {
+      "enabled": true,
+      "type": "local",
+      "command": [
+        "docker", "run", "-i", "--rm",
+        "-e", "GITHUB_PERSONAL_ACCESS_TOKEN",
+        "ghcr.io/github/github-mcp-server"
+      ],
+      "environment": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "${input:github_token}",
+      },
+    },
+  },
 }
+
