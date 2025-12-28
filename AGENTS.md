@@ -32,6 +32,8 @@
 - **Type Check**: No dedicated type checking configured
 - **Lint**: No linting configured at root level
 - **Run Specific Test**: `node examples/trello-automation.js --dry-run --verbose`
+- **Run Framework Validation**: `opencode --agent openagent` then `/validate-repo`
+- **Test Agent Commands**: Use agents directly to test functionality in real scenarios
 
 ## Framework Standards
 
@@ -43,30 +45,7 @@
 
 ## Agent Library Overview
 
-This repository contains a comprehensive library of AI agents that can be used for:
-
-### 🤖 **Main Agents**
-- **openagent**: Universal coordinator for general tasks, questions, and workflows
-- **opencoder**: Specialized development agent for complex coding and architecture
-- **system-builder**: Interactive generator for creating custom AI architectures
-
-### 🔧 **Specialized Subagents**
-- **Core**: task-manager, documentation
-- **Code**: coder-agent, reviewer, tester, build-agent, codebase-pattern-analyst
-- **System Builder**: domain-analyzer, agent-generator, context-organizer, workflow-designer, command-creator
-- **Utils**: image-specialist
-
-### ⚡ **Commands**
-- **Development**: `/commit`, `/test`, `/optimize`, `/clean`
-- **Management**: `/context`, `/validate-repo`
-- **Creation**: `/build-context-system`
-
-### 📚 **Use Cases**
-- **Software Development**: Code generation, testing, review, refactoring
-- **Automation**: API integrations, workflow automation, task management
-- **Content Creation**: Documentation, technical writing, image generation
-- **System Architecture**: Custom AI system design and implementation
-- **Any Domain**: Agents adapt to your specific needs and patterns
+This repository contains a comprehensive library of AI agents that can be used for software development, automation, content creation, and any domain. Agents include: openagent (universal coordinator), opencoder (development specialist), system-builder (architecture generator), plus specialized subagents for code, testing, documentation, and utilities.
 
 ## Code Style Guidelines
 
@@ -74,18 +53,37 @@ This repository contains a comprehensive library of AI agents that can be used f
 **Modular, Functional, Maintainable**: Pure functions, immutability, composition over inheritance. Golden rule: "If you can't easily test it, refactor it."
 
 ### JavaScript/TypeScript Conventions
-- **Imports**: Node.js built-ins → third-party packages → local modules (alphabetically within groups)
-- **Naming**:
-  - Files: `kebab-case.js` (e.g., `create-bills-cards.js`)
-  - Functions: `verbPhrases` (e.g., `calculateDueDate`, `validateEmail`)
-  - Variables: `descriptiveCamelCase` (e.g., `userCount`, `isValidEmail`)
-  - Constants: `UPPER_SNAKE_CASE` (e.g., `TRELLO_API_KEY`, `DRY_RUN`)
-  - Classes: `PascalCase` (e.g., `TrelloClient`, `CardBuilder`)
-  - Types: `PascalCase` (e.g., `CardConfig`, `ApiResponse`)
-- **Functions**: Pure functions preferred (< 50 lines) - same input = same output, no side effects
-- **Async/Await**: Use async/await over promises for readability
-- **Error Handling**: Try/catch with specific error types, meaningful messages with context
-- **Types**: Use TypeScript interfaces for complex objects, prefer explicit typing
+
+#### Imports & Modules
+- **Order**: Node.js built-ins → third-party packages → local modules (alphabetically within groups)
+- **Grouping**: Separate groups with blank lines
+
+#### Naming Conventions
+- **Files**: `kebab-case.js` (e.g., `create-bills-cards.js`, `agent-factory.ts`)
+- **Functions**: `verbPhrases` (e.g., `calculateDueDate`, `validateEmail`, `processRequest`)
+- **Variables**: `descriptiveCamelCase` (e.g., `userCount`, `isValidEmail`, `apiResponse`)
+- **Constants**: `UPPER_SNAKE_CASE` (e.g., `API_KEY`, `DRY_RUN`, `MAX_RETRIES`)
+- **Classes**: `PascalCase` (e.g., `TrelloClient`, `CardBuilder`, `AgentFactory`)
+- **Types**: `PascalCase` (e.g., `CardConfig`, `ApiResponse`, `AgentOptions`)
+- **Interfaces**: `PascalCase` with `I` prefix optional (e.g., `ICardConfig` or `CardConfig`)
+- **Enums**: `PascalCase` (e.g., `AgentMode`, `TaskStatus`)
+
+#### Functions & Methods
+- **Pure functions preferred**: < 50 lines, same input = same output, no side effects
+- **Async/Await**: Always use async/await over promises for readability
+- **Parameters**: Limit to 3-4 parameters; use objects for complex parameter sets
+- **Return types**: Explicit TypeScript return types for all functions
+
+#### Error Handling
+- **Try/Catch**: Use specific error types with meaningful messages
+- **Error classes**: Create custom error classes for domain-specific errors
+- **Validation**: Fail fast with clear error messages
+
+#### TypeScript Specific
+- **Strict mode**: Enable all strict TypeScript compiler options
+- **Explicit typing**: Prefer explicit types over `any` or inference
+- **Interfaces**: Use for object shapes and complex types
+- **Generics**: Use for reusable components and type safety
 
 ### Functional Programming Patterns
 - **Pure Functions**: Same input = same output, no side effects
@@ -93,10 +91,15 @@ This repository contains a comprehensive library of AI agents that can be used f
 - **Composition**: Build complex from simple functions (`pipe(validate, enrich, save)`)
 - **Declarative**: Describe what, not how (`users.filter(u => u.active).map(u => u.name)`)
 
+#### Formatting
+- **Indentation**: 2 spaces (no tabs)
+- **Line Length**: Max 100 characters
+- **Semicolons**: Always use semicolons
+- **Quotes**: Single quotes for strings, double quotes for JSX attributes
+
 ### Security Best Practices
 - **Secrets**: ALWAYS use environment variables - NEVER commit credentials
 - **Input Validation**: Validate all external data (API responses, config files)
-- **Sanitization**: Escape user input before logging or displaying
 - **API Keys**: Store in GitHub Secrets for Actions, `.env` for local (gitignored)
 - **Logging**: NEVER log sensitive data (tokens, API keys, passwords)
 
@@ -105,23 +108,18 @@ This repository contains a comprehensive library of AI agents that can be used f
 - **Pure Functions**: Avoid side effects, return new data instead of mutating
 - **Dependency Injection**: Pass dependencies explicitly, no hidden globals
 - **Comments**: Explain "why" not "what" - focus on business logic and decisions
-- **Error Messages**: Actionable and specific (e.g., "Template card 'Monthly Bills' not found in TEMPLATE list")
 
 ### Testing Standards
 - **AAA Pattern**: Arrange → Act → Assert (one assertion per test)
 - **Coverage Goals**: Critical logic (100%), public APIs (90%+), utilities (80%+)
-- **Test Behavior**: Focus on what code does, not implementation details
 - **Mock Dependencies**: Use dependency injection for testable code
-- **Edge Cases**: Test happy path, boundaries, errors, and invalid inputs
 
 ## OpenAgents Framework Standards
 
 ### Agent Development
 - **Location**: `.opencode/agent/` (organized by category: core, development, content, etc.)
 - **Format**: Markdown with YAML frontmatter + structured agent instructions
-- **Required YAML**: `description` (with usage examples), `mode: subagent`, optional `tools` permissions
 - **Model**: Always `anthropic/claude-sonnet-4-5` (configured in `opencode.jsonc`)
-- **File Naming**: `kebab-case.md` (e.g., `openagent.md`, `task-manager.md`)
 
 ### Context Loading (Agents)
 ```markdown
@@ -163,22 +161,6 @@ opencode --agent opencoder
 /optimize        # Code optimization
 /clean           # Cleanup operations
 /context         # Load project context
-```
-
-### Common Patterns
-```javascript
-// Pure function example
-function calculateDueDate(monthEnd, offsetDays) {
-  const dueDate = new Date(monthEnd);
-  dueDate.setDate(dueDate.getDate() + offsetDays);
-  return dueDate;
-}
-
-// Environment variable usage
-const API_KEY = process.env.API_KEY;
-if (!API_KEY) {
-  throw new Error('Missing required environment variable: API_KEY');
-}
 ```
 
 
