@@ -7,8 +7,8 @@
 **Tech Stack**: Node.js/JavaScript, Trello API, GitHub Actions, OpenCode CLI, MCP (Model Context Protocol)
 **Config**: Default model `anthropic/claude-sonnet-4-5` in `opencode.jsonc`
 
-## ⚠️ Security Alert
-**CRITICAL**: Hardcoded Trello API credentials found in `opencode.jsonc`. These must be moved to environment variables immediately.
+## ✅ Security Status
+**SECURE**: All credentials properly configured with environment variables. No hardcoded secrets found.
 
 ## Build/Test Commands
 
@@ -128,16 +128,6 @@
 - **Common Commands**: `/commit` (smart commits), `/test`, `/optimize`, `/clean`, `/context`
 - **Custom Commands**: Create new commands following existing patterns
 
-## Context Loading (Agents)
-```markdown
-# Agents automatically load context before execution:
-- Code tasks → .opencode/context/core/standards/code.md
-- Docs tasks → .opencode/context/core/standards/docs.md
-- Tests tasks → .opencode/context/core/standards/tests.md
-- Review tasks → .opencode/context/core/workflows/review.md
-- Delegation → .opencode/context/core/workflows/delegation.md
-```
-
 
 
 ## Pull Request Guidelines
@@ -155,13 +145,11 @@
 - ✅ Input validation for external data
 - ✅ Comments explain "why" not "what"
 - ✅ Code follows naming conventions
-- ✅ Agent YAML frontmatter complete (if agent PR)
 
 ### Review Priorities
 1. **Security**: No exposed secrets, proper input validation
 2. **Readability**: Clear naming, meaningful comments, logical structure
 3. **Maintainability**: Modular code, single responsibility, testable
-4. **Performance**: Efficient API usage, avoid unnecessary calls
 
 ## Quick Reference
 
@@ -197,12 +185,6 @@ try {
 } catch (error) {
   console.error(`❌ Failed to create card: ${error.message}`);
   throw new Error(`Card creation failed: ${error.message}`);
-}
-
-// Environment variable usage
-const TRELLO_API_KEY = process.env.TRELLO_API_KEY;
-if (!TRELLO_API_KEY) {
-  throw new Error('Missing required environment variable: TRELLO_API_KEY');
 }
 ```
 
