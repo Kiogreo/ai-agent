@@ -1,166 +1,342 @@
 # Agent Guidelines
 
 ## Repository Context
-**Purpose**: OpenAgents Framework - A comprehensive library of reusable AI agents for software development, automation, content creation, and any domain
-**Type**: AI Agent Framework - Modular agents that can be combined for any use case (Trello automation is just one example)
-**Structure**: `.opencode/` (agent framework), `examples/` (sample applications), `.output/` (temp AI outputs)
-**Tech Stack**: Node.js/TypeScript, OpenCode CLI, MCP (Model Context Protocol), GitHub Actions
-**Config**: Default model `anthropic/claude-sonnet-4-5` in `opencode.jsonc`
+**Purpose**: OpenAgents framework for AI-assisted development with Trello/GitHub MCP integration  
+**Type**: AI agent development environment with Model Context Protocol (MCP) servers  
+**Structure**: `.opencode/` (agents, commands, context), `.output/` (temp outputs), `.github/` (workflows)  
+**Tech Stack**: OpenCode CLI, MCP (Trello/GitHub), Markdown agents, JSONC config  
+**Model**: `anthropic/claude-sonnet-4-5` (configured in `opencode.jsonc`)
 
 ## ✅ Security Status
 **SECURE**: All credentials properly configured with environment variables. No hardcoded secrets found.
 
 ## Build/Test Commands
 
-### OpenAgents Framework (Primary)
-- **Install**: `cd .opencode && bun install`
-- **Start Universal Agent**: `opencode --agent openagent` (general tasks, questions, coordination)
-- **Start Development Agent**: `opencode --agent opencoder` (complex coding, architecture)
-- **Start System Builder**: `opencode --agent system-builder` (create custom AI systems)
-- **Commands**: `/commit`, `/test`, `/optimize`, `/clean`, `/context`, `/validate-repo`
-- **Validation**: Manual review + testing agents in real usage scenarios
+### OpenCode CLI
+```bash
+# Start agents
+opencode --agent openagent              # Universal agent (general tasks, questions)
+opencode --agent opencoder              # Development specialist (complex coding)
+opencode --agent system-builder         # System architect (generate AI systems)
 
-### Example Applications (Optional)
-- **Trello Automation**: Example bill management system (see README.md for setup)
-- **Custom Applications**: Build your own using the agent framework
-- **Local Testing**: `npm test` (dry-run mode for examples)
-- **Production**: `npm start` (run example applications)
+# Run commands
+/commit                                 # Smart git commits with conventional format
+/test                                   # Run testing workflows
+/optimize                               # Code optimization analysis
+/clean                                  # Cleanup operations
+/context                                # Context management
+/validate-repo                          # Validate repository consistency
 
-### Testing Commands
-- **Framework Tests**: No dedicated test suite (agents validated through usage)
-- **Example Tests**: `npm test` (dry-run mode for sample applications)
-- **Type Check**: No dedicated type checking configured
-- **Lint**: No linting configured at root level
-- **Run Specific Test**: `node examples/trello-automation.js --dry-run --verbose`
-- **Run Framework Validation**: `opencode --agent openagent` then `/validate-repo`
-- **Test Agent Commands**: Use agents directly to test functionality in real scenarios
+# Check version
+opencode --version
+```
 
-## Framework Standards
+### Agent Development
+```bash
+# Install dependencies (if using Bun runtime)
+cd .opencode && bun install
 
-### Configuration
-- **Credentials**: Environment variables only - NEVER hardcode API keys
-- **MCP Servers**: Configured in `opencode.jsonc` (Trello, GitHub, etc.)
-- **Context Files**: Automatic loading based on task type
-- **Agent Delegation**: Intelligent routing to specialized subagents
+# Validate agent structure
+# Check: YAML frontmatter + markdown structure
 
-## Agent Library Overview
+# Test agent
+opencode --agent <agent-name>           # Manual testing in real scenarios
 
-This repository contains a comprehensive library of AI agents that can be used for software development, automation, content creation, and any domain. Agents include: openagent (universal coordinator), opencoder (development specialist), system-builder (architecture generator), plus specialized subagents for code, testing, documentation, and utilities.
+# Validate repository
+/validate-repo                          # Checks agents, context, commands consistency
+```
+
+### MCP Servers
+```bash
+# Trello MCP: Configured in opencode.jsonc with API credentials
+# GitHub MCP: Docker-based, requires GITHUB_PERSONAL_ACCESS_TOKEN
+# Test MCP: Use agent commands that interact with Trello/GitHub APIs
+```
 
 ## Code Style Guidelines
 
-### Core Philosophy
-**Modular, Functional, Maintainable**: Pure functions, immutability, composition over inheritance. Golden rule: "If you can't easily test it, refactor it."
+### Markdown Agents (.opencode/agent/)
+**File Naming**: `kebab-case.md` (e.g., `openagent.md`, `task-manager.md`)
 
-### JavaScript/TypeScript Conventions
-
-#### Imports & Modules
-- **Order**: Node.js built-ins → third-party packages → local modules (alphabetically within groups)
-- **Grouping**: Separate groups with blank lines
-
-#### Naming Conventions
-- **Files**: `kebab-case.js` (e.g., `create-bills-cards.js`, `agent-factory.ts`)
-- **Functions**: `verbPhrases` (e.g., `calculateDueDate`, `validateEmail`, `processRequest`)
-- **Variables**: `descriptiveCamelCase` (e.g., `userCount`, `isValidEmail`, `apiResponse`)
-- **Constants**: `UPPER_SNAKE_CASE` (e.g., `API_KEY`, `DRY_RUN`, `MAX_RETRIES`)
-- **Classes**: `PascalCase` (e.g., `TrelloClient`, `CardBuilder`, `AgentFactory`)
-- **Types**: `PascalCase` (e.g., `CardConfig`, `ApiResponse`, `AgentOptions`)
-- **Interfaces**: `PascalCase` with `I` prefix optional (e.g., `ICardConfig` or `CardConfig`)
-- **Enums**: `PascalCase` (e.g., `AgentMode`, `TaskStatus`)
-
-#### Functions & Methods
-- **Pure functions preferred**: < 50 lines, same input = same output, no side effects
-- **Async/Await**: Always use async/await over promises for readability
-- **Parameters**: Limit to 3-4 parameters; use objects for complex parameter sets
-- **Return types**: Explicit TypeScript return types for all functions
-
-#### Error Handling
-- **Try/Catch**: Use specific error types with meaningful messages
-- **Error classes**: Create custom error classes for domain-specific errors
-- **Validation**: Fail fast with clear error messages
-
-#### TypeScript Specific
-- **Strict mode**: Enable all strict TypeScript compiler options
-- **Explicit typing**: Prefer explicit types over `any` or inference
-- **Interfaces**: Use for object shapes and complex types
-- **Generics**: Use for reusable components and type safety
-
-### Functional Programming Patterns
-- **Pure Functions**: Same input = same output, no side effects
-- **Immutability**: Create new data, don't modify existing (`[...items, item]` not `items.push(item)`)
-- **Composition**: Build complex from simple functions (`pipe(validate, enrich, save)`)
-- **Declarative**: Describe what, not how (`users.filter(u => u.active).map(u => u.name)`)
-
-#### Formatting
-- **Indentation**: 2 spaces (no tabs)
-- **Line Length**: Max 100 characters
-- **Semicolons**: Always use semicolons
-- **Quotes**: Single quotes for strings, double quotes for JSX attributes
-
-### Security Best Practices
-- **Secrets**: ALWAYS use environment variables - NEVER commit credentials
-- **Input Validation**: Validate all external data (API responses, config files)
-- **API Keys**: Store in GitHub Secrets for Actions, `.env` for local (gitignored)
-- **Logging**: NEVER log sensitive data (tokens, API keys, passwords)
-
-### Code Structure
-- **Modularity**: Single responsibility per component (< 100 lines, ideally < 50)
-- **Pure Functions**: Avoid side effects, return new data instead of mutating
-- **Dependency Injection**: Pass dependencies explicitly, no hidden globals
-- **Comments**: Explain "why" not "what" - focus on business logic and decisions
-
-### Testing Standards
-- **AAA Pattern**: Arrange → Act → Assert (one assertion per test)
-- **Coverage Goals**: Critical logic (100%), public APIs (90%+), utilities (80%+)
-- **Mock Dependencies**: Use dependency injection for testable code
-
-## OpenAgents Framework Standards
-
-### Agent Development
-- **Location**: `.opencode/agent/` (organized by category: core, development, content, etc.)
-- **Format**: Markdown with YAML frontmatter + structured agent instructions
-- **Model**: Always `anthropic/claude-sonnet-4-5` (configured in `opencode.jsonc`)
-
-### Context Loading (Agents)
-```markdown
-# Agents automatically load context before execution:
-- Code tasks → .opencode/context/core/standards/code.md
-- Docs tasks → .opencode/context/core/standards/docs.md
-- Tests tasks → .opencode/context/core/standards/tests.md
-- Review tasks → .opencode/context/core/workflows/review.md
-- Delegation → .opencode/context/core/workflows/delegation.md
+**YAML Frontmatter** (required):
+```yaml
+---
+id: agent-name
+name: Agent Name
+description: "Clear description with usage examples"
+mode: primary|subagent
+temperature: 0.2
+tools:
+  read: true
+  write: true
+  bash: true
+---
 ```
 
+**Structure** (in order):
+1. Role statement (clear identity and purpose)
+2. Core responsibilities (what the agent does)
+3. Output structure (expected deliverables)
+4. Quality standards (validation criteria)
+5. Process workflow (step-by-step execution)
+6. Usage examples (user/assistant dialogue)
 
+**Model**: Always `anthropic/claude-sonnet-4-5`
 
-## Quality Standards
+### Context Files (.opencode/context/)
+**Location**:
+- `core/` - Universal patterns (essential-patterns.md, standards/, workflows/)
+- `project/` - Project-specific patterns (project-context.md)
+
+**Standards**: `core/standards/` (code.md, docs.md, tests.md, patterns.md, analysis.md)  
+**Workflows**: `core/workflows/` (delegation.md, review.md, sessions.md, task-breakdown.md)
+
+**Format**: Markdown with clear sections, code examples, anti-patterns  
+**Auto-Loading**: Agents load relevant context before execution
+
+### Commands (.opencode/command/)
+**Format**: Markdown with YAML frontmatter + detailed instructions  
+**Invocation**: `/command-name` in OpenCode CLI  
+**Structure**: Description, arguments, examples, step-by-step process
+
+### JavaScript/Node.js (if adding scripts)
+**Imports**: Node.js built-ins → third-party → local (alphabetically)
+
+**Naming**:
+- Files: `kebab-case.js`
+- Functions: `camelCase` (e.g., `processData`, `validateInput`)
+- Constants: `UPPER_SNAKE_CASE`
+- Classes: `PascalCase`
+
+**Functions**: Pure functions preferred (same input = same output, no side effects)
+
+**Async/Await**: Use async/await over promises
+
+**Error Handling**: Try/catch with specific error types, meaningful messages
+```javascript
+// ✅ Good
+try {
+  const data = await fetchData();
+  return { success: true, data };
+} catch (error) {
+  return { success: false, error: error.message };
+}
+
+// ❌ Bad
+const data = await fetchData(); // No error handling
+```
+
+## Core Coding Patterns
+
+### Pure Functions (ALWAYS use)
+```javascript
+// ✅ Pure - same input = same output, no side effects
+const add = (a, b) => a + b;
+const formatUser = (user) => ({ ...user, fullName: `${user.firstName} ${user.lastName}` });
+
+// ❌ Impure - side effects
+let total = 0;
+const addToTotal = (value) => { total += value; return total; };
+```
+
+### Immutability (ALWAYS use)
+```javascript
+// ✅ Immutable - create new data
+const addItem = (items, item) => [...items, item];
+const updateUser = (user, changes) => ({ ...user, ...changes });
+
+// ❌ Mutable - modifies existing data
+const addItem = (items, item) => { items.push(item); return items; };
+```
+
+### Composition (prefer over inheritance)
+```javascript
+// ✅ Compose small functions
+const processUser = pipe(validateUser, enrichUserData, saveUser);
+
+// ❌ Deep inheritance
+class ExtendedUserManagerWithValidation extends UserManager { }
+```
+
+### Small Functions (< 50 lines)
+```javascript
+// ✅ Small, focused
+const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+const normalizeEmail = (email) => email.toLowerCase().trim();
+
+// ❌ Large, unfocused
+function processUserData(user) {
+  // 100+ lines of mixed concerns
+}
+```
+
+## Security Best Practices
+
+### Environment Variables (CRITICAL)
+```bash
+# ✅ ALWAYS use environment variables for secrets
+TRELLO_API_KEY=your_api_key_here
+TRELLO_TOKEN=your_token_here
+GITHUB_PERSONAL_ACCESS_TOKEN=your_token_here
+
+# ❌ NEVER hardcode credentials
+const API_KEY = "abc123"; // WRONG!
+```
+
+**Configuration** (`opencode.jsonc`):
+```jsonc
+{
+  "environment": {
+    "TRELLO_API_KEY": "${env:TRELLO_API_KEY}",
+    "TRELLO_TOKEN": "${env:TRELLO_TOKEN}"
+  }
+}
+```
+
+### Input Validation (ALWAYS)
+```javascript
+// ✅ Validate all external data
+function processInput(data) {
+  if (!data || typeof data !== 'object') {
+    throw new Error('Invalid input: expected object');
+  }
+  // Process validated data
+}
+
+// ❌ No validation
+function processInput(data) {
+  return data.value; // Could crash if data is null/undefined
+}
+```
+
+### Logging (NEVER log secrets)
+```javascript
+// ✅ Safe logging
+logger.info('User authenticated', { userId: user.id });
+
+// ❌ Exposes secrets
+logger.info('Auth token', { token: user.token }); // WRONG!
+```
+
+## Agent Development Standards
+
+### Agent Categories (.opencode/agent/)
+- **core/**: Main user-facing agents (openagent, opencoder)
+- **meta/**: Meta-level agents (system-builder)
+- **subagents/**: Specialized helpers (task-manager, tester, reviewer, etc.)
+- **development/**: Domain specialists (frontend, backend, devops)
+- **content/**: Content creation (copywriter, technical-writer)
+
+### Context Loading Pattern
+Agents automatically load context before execution:
+- Code tasks → `.opencode/context/core/standards/code.md`
+- Docs tasks → `.opencode/context/core/standards/docs.md`
+- Tests tasks → `.opencode/context/core/standards/tests.md`
+- Review tasks → `.opencode/context/core/workflows/review.md`
+
+## MCP Integration Patterns
+
+### Trello MCP Usage
+```javascript
+// Agents can call Trello MCP functions:
+// - trello-mcp_get_lists
+// - trello-mcp_get_cards_by_list_id
+// - trello-mcp_add_card_to_list
+// - trello-mcp_update_card_details
+// - trello-mcp_move_card
+// - trello-mcp_archive_card
+```
+
+### GitHub MCP Usage
+```javascript
+// Agents can call GitHub MCP functions:
+// - github_create_pull_request
+// - github_list_issues
+// - github_create_or_update_file
+// - github_search_code
+// - github_merge_pull_request
+```
+
+## Pull Request Guidelines
+
+### PR Template
+**Location**: `.github/pull_request_template.md`
+
+**Required Sections**:
+- Feature Type (New Agent, Agent Enhancement, Documentation, Infrastructure)
+- Description (what changed and why)
+- Test Summary (how it was tested)
+- Screenshot (optional, for UI changes)
 
 ### Review Checklist
-- ✅ No hardcoded credentials or API keys
-- ✅ Environment variables used for secrets
-- ✅ Error handling with meaningful messages
-- ✅ Pure functions where possible (no unnecessary side effects)
-- ✅ Input validation for external data
-- ✅ Comments explain "why" not "what"
-- ✅ Code follows naming conventions
-- ✅ Agent YAML frontmatter complete (if agent PR)
+- ✅ No hardcoded credentials (use environment variables)
+- ✅ Agent YAML frontmatter complete (description, mode, tools)
+- ✅ Context files updated (if patterns changed)
+- ✅ Commands follow markdown structure
+- ✅ Security best practices followed
+- ✅ Documentation updated
 
 ## Quick Reference
 
 ### Starting Development
 ```bash
-# Start universal agent (general tasks, questions, coordination)
+# Universal agent (general tasks, questions, coordination)
 opencode --agent openagent
 
-# Start development specialist (complex coding, refactoring)
+# Development specialist (complex coding, refactoring)
 opencode --agent opencoder
+
+# System builder (generate custom AI systems)
+opencode --agent system-builder
 
 # Use commands
 /commit          # Smart git commits
 /test            # Run tests
 /optimize        # Code optimization
 /clean           # Cleanup operations
-/context         # Load project context
+/context         # Context management
+/validate-repo   # Validate repository structure
 ```
 
+### Common Patterns
+```javascript
+// Pure function pattern (from code.md)
+const add = (a, b) => a + b;
+const formatUser = (user) => ({ ...user, fullName: `${user.firstName} ${user.lastName}` });
 
+// Immutability pattern
+const addItem = (items, item) => [...items, item];
+const updateUser = (user, changes) => ({ ...user, ...changes });
+
+// Error handling pattern
+function parseJSON(text) {
+  try {
+    return { success: true, data: JSON.parse(text) };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+}
+```
+
+### Environment Variables
+```bash
+# Required for MCP servers
+TRELLO_API_KEY=your_api_key
+TRELLO_TOKEN=your_token
+TRELLO_WORKSPACE_ID=your_workspace_id
+GITHUB_PERSONAL_ACCESS_TOKEN=your_github_token
+
+# Optional for plugins/tools
+GEMINI_API_KEY=your_gemini_key
+TELEGRAM_BOT_TOKEN=your_bot_token
+TELEGRAM_CHAT_ID=your_chat_id
+```
+
+## Additional Resources
+
+- **OpenAgents README**: `.opencode/README.md` - Complete framework documentation
+- **Essential Patterns**: `.opencode/context/core/essential-patterns.md` - Core coding patterns
+- **Code Standards**: `.opencode/context/core/standards/code.md` - Modular, functional, maintainable code
+- **OpenCode Docs**: https://opencode.ai/docs
+- **Trello API**: https://developer.atlassian.com/cloud/trello/rest/
+- **GitHub API**: https://docs.github.com/en/rest
