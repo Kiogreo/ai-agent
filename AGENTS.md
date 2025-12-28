@@ -1,10 +1,10 @@
 # Agent Guidelines
 
 ## Repository Context
-**Purpose**: Trello automation tool for Casa Tropicana A-7-7 bill management with OpenAgents framework integration
-**Type**: Hybrid project - JavaScript automation scripts + AI agent development environment
-**Structure**: Root (Trello automation), `.opencode/` (OpenAgents framework), `.output/` (temp AI outputs)
-**Tech Stack**: Node.js/JavaScript, Trello API, GitHub Actions, OpenCode CLI, MCP (Model Context Protocol)
+**Purpose**: OpenAgents Framework - A comprehensive library of reusable AI agents for software development, automation, content creation, and any domain
+**Type**: AI Agent Framework - Modular agents that can be combined for any use case (Trello automation is just one example)
+**Structure**: `.opencode/` (agent framework), `examples/` (sample applications), `.output/` (temp AI outputs)
+**Tech Stack**: Node.js/TypeScript, OpenCode CLI, MCP (Model Context Protocol), GitHub Actions
 **Config**: Default model `anthropic/claude-sonnet-4-5` in `opencode.jsonc`
 
 ## ✅ Security Status
@@ -12,36 +12,61 @@
 
 ## Build/Test Commands
 
-### Trello Automation (Root Level)
-- **Install**: No package.json at root - automation uses GitHub Actions runtime
-- **Local Setup**: Create `.env` file with `TRELLO_API_KEY` and `TRELLO_TOKEN`
-- **Test Locally**: `npm test` (dry-run mode - simulates without creating cards)
-- **Run Production**: `npm start` (creates actual Trello cards)
-- **Manual Trigger**: GitHub Actions → "Trello Bills Automation" → "Run workflow"
-- **View Logs**: GitHub Actions → Select workflow run → "create-bills-cards" job
-- **Schedule**: Daily at 1:00 AM UTC (configured in `.github/workflows/trello-automation.yml`)
-
-### OpenAgents Framework (.opencode/)
+### OpenAgents Framework (Primary)
 - **Install**: `cd .opencode && bun install`
-- **Start Agent**: `opencode --agent openagent` (universal coordinator)
-- **Development**: `opencode --agent opencoder` (complex coding tasks)
-- **Commands**: `/commit`, `/test`, `/optimize`, `/clean`, `/context`
+- **Start Universal Agent**: `opencode --agent openagent` (general tasks, questions, coordination)
+- **Start Development Agent**: `opencode --agent opencoder` (complex coding, architecture)
+- **Start System Builder**: `opencode --agent system-builder` (create custom AI systems)
+- **Commands**: `/commit`, `/test`, `/optimize`, `/clean`, `/context`, `/validate-repo`
 - **Validation**: Manual review + testing agents in real usage scenarios
 
+### Example Applications (Optional)
+- **Trello Automation**: Example bill management system (see README.md for setup)
+- **Custom Applications**: Build your own using the agent framework
+- **Local Testing**: `npm test` (dry-run mode for examples)
+- **Production**: `npm start` (run example applications)
+
 ### Testing Commands
-- **Single Test Run**: No individual test files - use `npm test` for dry-run validation
-- **Full Test Suite**: `npm test` (dry-run) or manual GitHub Actions trigger
+- **Framework Tests**: No dedicated test suite (agents validated through usage)
+- **Example Tests**: `npm test` (dry-run mode for sample applications)
 - **Type Check**: No dedicated type checking configured
 - **Lint**: No linting configured at root level
-- **Run Specific Test**: `node create-bills-cards.js --dry-run --verbose` (for Trello automation)
+- **Run Specific Test**: `node examples/trello-automation.js --dry-run --verbose`
 
-## Trello Automation Standards
+## Framework Standards
 
 ### Configuration
 - **Credentials**: Environment variables only - NEVER hardcode API keys
-- **Templates**: Cards in TEMPLATE list serve as blueprints for automation
-- **Error Handling**: Log detailed error messages, fail fast on invalid config
-- **Dry Run Mode**: Test without creating actual cards (`DRY_RUN=true`)
+- **MCP Servers**: Configured in `opencode.jsonc` (Trello, GitHub, etc.)
+- **Context Files**: Automatic loading based on task type
+- **Agent Delegation**: Intelligent routing to specialized subagents
+
+## Agent Library Overview
+
+This repository contains a comprehensive library of AI agents that can be used for:
+
+### 🤖 **Main Agents**
+- **openagent**: Universal coordinator for general tasks, questions, and workflows
+- **opencoder**: Specialized development agent for complex coding and architecture
+- **system-builder**: Interactive generator for creating custom AI architectures
+
+### 🔧 **Specialized Subagents**
+- **Core**: task-manager, documentation
+- **Code**: coder-agent, reviewer, tester, build-agent, codebase-pattern-analyst
+- **System Builder**: domain-analyzer, agent-generator, context-organizer, workflow-designer, command-creator
+- **Utils**: image-specialist
+
+### ⚡ **Commands**
+- **Development**: `/commit`, `/test`, `/optimize`, `/clean`
+- **Management**: `/context`, `/validate-repo`
+- **Creation**: `/build-context-system`
+
+### 📚 **Use Cases**
+- **Software Development**: Code generation, testing, review, refactoring
+- **Automation**: API integrations, workflow automation, task management
+- **Content Creation**: Documentation, technical writing, image generation
+- **System Architecture**: Custom AI system design and implementation
+- **Any Domain**: Agents adapt to your specific needs and patterns
 
 ## Code Style Guidelines
 
@@ -150,9 +175,9 @@ function calculateDueDate(monthEnd, offsetDays) {
 }
 
 // Environment variable usage
-const TRELLO_API_KEY = process.env.TRELLO_API_KEY;
-if (!TRELLO_API_KEY) {
-  throw new Error('Missing required environment variable: TRELLO_API_KEY');
+const API_KEY = process.env.API_KEY;
+if (!API_KEY) {
+  throw new Error('Missing required environment variable: API_KEY');
 }
 ```
 
