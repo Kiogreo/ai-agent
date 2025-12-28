@@ -1,342 +1,181 @@
-# Agent Guidelines
+# AI AGENT DEVELOPMENT ENVIRONMENT
 
-## Repository Context
-**Purpose**: OpenAgents framework for AI-assisted development with Trello/GitHub MCP integration  
-**Type**: AI agent development environment with Model Context Protocol (MCP) servers  
-**Structure**: `.opencode/` (agents, commands, context), `.output/` (temp outputs), `.github/` (workflows)  
-**Tech Stack**: OpenCode CLI, MCP (Trello/GitHub), Markdown agents, JSONC config  
-**Model**: `anthropic/claude-sonnet-4-5` (configured in `opencode.jsonc`)
+**Generated:** 2025-12-28  
+**Commit:** 8794fc8  
+**Branch:** main  
+**Type:** OpenCode CLI + Fitness Coaching Extension
 
-## ✅ Security Status
-**SECURE**: All credentials properly configured with environment variables. No hardcoded secrets found.
+## OVERVIEW
 
-## Build/Test Commands
+OpenAgents framework for AI development with Trello/GitHub MCP integration. Extended with fitness coaching domain (bear aesthetic bodybuilding). Markdown-based agents, context-aware execution, approval-first workflows.
 
-### OpenCode CLI
+## STRUCTURE
+
+```
+./
+├── .opencode/          # Agent framework (66 .md files)
+│   ├── agent/          # 4 main + 17 subagents
+│   │   ├── core/       # openagent, opencoder (universal)
+│   │   ├── meta/       # system-builder (AI system generator)
+│   │   └── subagents/  # fitness/, code/, core/, system-builder/
+│   ├── command/        # 13 slash commands (+ fitness/ subdomain)
+│   ├── context/        # 21 context files
+│   │   ├── core/       # standards/, workflows/, system/
+│   │   ├── domain/     # fitness/ (NON-STANDARD)
+│   │   ├── processes/  # fitness/ workflows (NON-STANDARD)
+│   │   ├── standards/  # fitness/ standards (NON-STANDARD)
+│   │   └── templates/  # fitness/ templates (NON-STANDARD)
+│   ├── workflows/      # fitness/ workflows (NON-STANDARD)
+│   ├── tool/           # gemini/, env/ implementations
+│   └── plugin/         # telegram-notify implementation
+├── .github/            # PR template
+├── opencode.jsonc      # MCP config (Trello bunx, GitHub Docker)
+└── .env.example        # Credential template
+```
+
+## WHERE TO LOOK
+
+| Task | Location | Notes |
+|------|----------|-------|
+| Add new agent | `.opencode/agent/` or `subagents/` | YAML frontmatter required |
+| Add slash command | `.opencode/command/` | Markdown + YAML |
+| Define coding patterns | `.opencode/context/core/standards/` | Auto-loaded by agents |
+| Add domain knowledge | `.opencode/context/domain/{domain}/` | Fitness pattern |
+| Configure MCP | `opencode.jsonc` | bunx (Trello), Docker (GitHub) |
+| Fitness coaching | `.opencode/agent/fitness-coach.md` | Bear aesthetic focus |
+| System generation | `/build-context-system` | Interactive AI system builder |
+
+## CONVENTIONS (DEVIATIONS FROM STANDARD)
+
+**Non-Standard Structure:**
+- **domain/processes/standards/templates/** in context/ (standard: only core/project/)
+- **workflows/** directory (not in base OpenCode)
+- **Fitness-specific primary agents** in agent/ (fitness-coach, motivation-agent, progress-tracker)
+- **Domain subdirectories** in command/ (fitness/)
+- **tool/ and plugin/** with implementations (standard: optional, no implementations)
+
+**Context Loading Rules:**
+- Max 4 files per command (250-450 lines total)
+- NEVER execute code/docs/tests without loading standards first
+- ALWAYS load context before delegation
+- Files: 50-150 lines each (focused)
+
+**Agent Execution:**
+- NEVER auto-fix - always report → propose → approve → fix
+- NEVER implement entire plan at once - incremental only
+- ALWAYS request approval before write/edit/bash
+- STOP on test fail/errors (no auto-fix)
+
+**Security:**
+- NEVER hardcode credentials (use env vars)
+- NEVER log secrets (API keys, tokens)
+- ALWAYS validate input (prevent injection)
+- ALWAYS use ${env:VAR} in opencode.jsonc
+
+## ANTI-PATTERNS (THIS PROJECT)
+
+**Agent Development:**
+- **Skip approval gate** → ALWAYS request approval before execution
+- **Auto-fix errors** → Report → propose → approve → fix
+- **Execute without context** → Load standards FIRST (code.md, docs.md, tests.md)
+- **Batch implementation** → Incremental, one step at a time
+- **Skip LoadContext step** → MANDATORY before any code/docs/tests
+
+**Context Management:**
+- **Delete outside session** → ONLY delete tracked files, confirm first
+- **Exceed 4 file limit** → Max 4 context files (250-450 lines total)
+- **Generic advice** → Project-specific only
+- **Repeat parent content** → Child AGENTS.md NEVER repeats parent
+
+**MCP Integration:**
+- **Hardcode credentials** → Use TRELLO_API_KEY, GITHUB_PERSONAL_ACCESS_TOKEN env vars
+- **Skip input validation** → ALWAYS validate external data
+- **Log sensitive data** → NEVER log tokens/keys
+
+**Code Structure:**
+- **Mutation/side effects** → Pure functions only
+- **Deep nesting (>3 levels)** → Flatten
+- **Large functions (>50 lines)** → Split
+- **Global state** → Dependency injection
+- **Tight coupling** → Composition over inheritance
+
+## UNIQUE STYLES
+
+**Fitness Domain Integration:**
+- Bear aesthetic bodybuilding focus (stocky, muscular chub, strong belly)
+- Kink-aware motivational messaging
+- Liftosaur workout tracking integration
+- Privacy-first image/video analysis (temporary processing, never stored)
+- Domain-specific context structure (domain/processes/standards/templates/)
+
+**Agent Architecture:**
+- Hierarchical: orchestrator → subagents (manager-worker pattern)
+- Context-aware: auto-load standards before execution
+- Approval-first: plan → approve → execute → validate → summarize
+- Incremental: step-by-step with validation gates
+
+**MCP Configuration:**
+- Trello: bunx @delorenj/mcp-server-trello (local)
+- GitHub: Docker ghcr.io/github/github-mcp-server (containerized)
+- Environment variable injection: ${env:VAR_NAME}
+
+## COMMANDS
+
 ```bash
 # Start agents
-opencode --agent openagent              # Universal agent (general tasks, questions)
-opencode --agent opencoder              # Development specialist (complex coding)
-opencode --agent system-builder         # System architect (generate AI systems)
+opencode --agent openagent              # Universal (questions, tasks, coordination)
+opencode --agent opencoder              # Development (complex coding, refactoring)
+opencode --agent fitness-coach          # Fitness coaching (bear aesthetic)
+opencode --agent system-builder         # AI system generator
 
-# Run commands
-/commit                                 # Smart git commits with conventional format
-/test                                   # Run testing workflows
-/optimize                               # Code optimization analysis
+# Slash commands
+/commit                                 # Smart git commits (conventional format)
+/test                                   # Testing workflows
+/optimize                               # Code optimization
 /clean                                  # Cleanup operations
 /context                                # Context management
-/validate-repo                          # Validate repository consistency
+/validate-repo                          # Repository validation
+/build-context-system                   # Generate custom AI systems
+/track-progress                         # Fitness progress (Liftosaur integration)
+/analyze-form                           # Exercise form analysis (privacy-protected)
+/coach-me                               # Motivational coaching (kink-aware)
+/set-goal                               # Fitness goal setting
 
-# Check version
-opencode --version
+# Development
+cd .opencode && bun install             # Install dependencies
+/validate-repo                          # Validate structure
 ```
 
-### Agent Development
-```bash
-# Install dependencies (if using Bun runtime)
-cd .opencode && bun install
+## NOTES
 
-# Validate agent structure
-# Check: YAML frontmatter + markdown structure
+**Fitness System:**
+- Fully integrated with existing OpenCode framework
+- Leverages image-specialist for visual analysis
+- Privacy-first: images processed temporarily, never stored
+- Liftosaur API integration for workout tracking
+- Bear aesthetic focus: chest/arms/shoulders/back priority, belly aesthetic maintenance
 
-# Test agent
-opencode --agent <agent-name>           # Manual testing in real scenarios
+**MCP Servers:**
+- Trello: Requires TRELLO_API_KEY, TRELLO_TOKEN, TRELLO_WORKSPACE_ID
+- GitHub: Requires GITHUB_PERSONAL_ACCESS_TOKEN
+- Both configured in opencode.jsonc with ${env:} references
 
-# Validate repository
-/validate-repo                          # Checks agents, context, commands consistency
-```
+**Context Loading:**
+- Agents auto-load context before execution
+- Code tasks → core/standards/code.md
+- Docs tasks → core/standards/docs.md
+- Tests tasks → core/standards/tests.md
+- Fitness tasks → domain/fitness/*.md
 
-### MCP Servers
-```bash
-# Trello MCP: Configured in opencode.jsonc with API credentials
-# GitHub MCP: Docker-based, requires GITHUB_PERSONAL_ACCESS_TOKEN
-# Test MCP: Use agent commands that interact with Trello/GitHub APIs
-```
+**Non-Obvious:**
+- package.json in .opencode/ (Node.js deps for plugins/tools)
+- Workflows directory (not in standard OpenCode)
+- Multiple README.md files (.opencode/, .opencode/plugin/, .opencode/tool/)
+- DEPENDENCIES.md and INDEX.md in .opencode/ (additional docs)
+- Domain-specific context structure (fitness pattern for future domains)
 
-## Code Style Guidelines
-
-### Markdown Agents (.opencode/agent/)
-**File Naming**: `kebab-case.md` (e.g., `openagent.md`, `task-manager.md`)
-
-**YAML Frontmatter** (required):
-```yaml
----
-id: agent-name
-name: Agent Name
-description: "Clear description with usage examples"
-mode: primary|subagent
-temperature: 0.2
-tools:
-  read: true
-  write: true
-  bash: true
----
-```
-
-**Structure** (in order):
-1. Role statement (clear identity and purpose)
-2. Core responsibilities (what the agent does)
-3. Output structure (expected deliverables)
-4. Quality standards (validation criteria)
-5. Process workflow (step-by-step execution)
-6. Usage examples (user/assistant dialogue)
-
-**Model**: Always `anthropic/claude-sonnet-4-5`
-
-### Context Files (.opencode/context/)
-**Location**:
-- `core/` - Universal patterns (essential-patterns.md, standards/, workflows/)
-- `project/` - Project-specific patterns (project-context.md)
-
-**Standards**: `core/standards/` (code.md, docs.md, tests.md, patterns.md, analysis.md)  
-**Workflows**: `core/workflows/` (delegation.md, review.md, sessions.md, task-breakdown.md)
-
-**Format**: Markdown with clear sections, code examples, anti-patterns  
-**Auto-Loading**: Agents load relevant context before execution
-
-### Commands (.opencode/command/)
-**Format**: Markdown with YAML frontmatter + detailed instructions  
-**Invocation**: `/command-name` in OpenCode CLI  
-**Structure**: Description, arguments, examples, step-by-step process
-
-### JavaScript/Node.js (if adding scripts)
-**Imports**: Node.js built-ins → third-party → local (alphabetically)
-
-**Naming**:
-- Files: `kebab-case.js`
-- Functions: `camelCase` (e.g., `processData`, `validateInput`)
-- Constants: `UPPER_SNAKE_CASE`
-- Classes: `PascalCase`
-
-**Functions**: Pure functions preferred (same input = same output, no side effects)
-
-**Async/Await**: Use async/await over promises
-
-**Error Handling**: Try/catch with specific error types, meaningful messages
-```javascript
-// ✅ Good
-try {
-  const data = await fetchData();
-  return { success: true, data };
-} catch (error) {
-  return { success: false, error: error.message };
-}
-
-// ❌ Bad
-const data = await fetchData(); // No error handling
-```
-
-## Core Coding Patterns
-
-### Pure Functions (ALWAYS use)
-```javascript
-// ✅ Pure - same input = same output, no side effects
-const add = (a, b) => a + b;
-const formatUser = (user) => ({ ...user, fullName: `${user.firstName} ${user.lastName}` });
-
-// ❌ Impure - side effects
-let total = 0;
-const addToTotal = (value) => { total += value; return total; };
-```
-
-### Immutability (ALWAYS use)
-```javascript
-// ✅ Immutable - create new data
-const addItem = (items, item) => [...items, item];
-const updateUser = (user, changes) => ({ ...user, ...changes });
-
-// ❌ Mutable - modifies existing data
-const addItem = (items, item) => { items.push(item); return items; };
-```
-
-### Composition (prefer over inheritance)
-```javascript
-// ✅ Compose small functions
-const processUser = pipe(validateUser, enrichUserData, saveUser);
-
-// ❌ Deep inheritance
-class ExtendedUserManagerWithValidation extends UserManager { }
-```
-
-### Small Functions (< 50 lines)
-```javascript
-// ✅ Small, focused
-const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-const normalizeEmail = (email) => email.toLowerCase().trim();
-
-// ❌ Large, unfocused
-function processUserData(user) {
-  // 100+ lines of mixed concerns
-}
-```
-
-## Security Best Practices
-
-### Environment Variables (CRITICAL)
-```bash
-# ✅ ALWAYS use environment variables for secrets
-TRELLO_API_KEY=your_api_key_here
-TRELLO_TOKEN=your_token_here
-GITHUB_PERSONAL_ACCESS_TOKEN=your_token_here
-
-# ❌ NEVER hardcode credentials
-const API_KEY = "abc123"; // WRONG!
-```
-
-**Configuration** (`opencode.jsonc`):
-```jsonc
-{
-  "environment": {
-    "TRELLO_API_KEY": "${env:TRELLO_API_KEY}",
-    "TRELLO_TOKEN": "${env:TRELLO_TOKEN}"
-  }
-}
-```
-
-### Input Validation (ALWAYS)
-```javascript
-// ✅ Validate all external data
-function processInput(data) {
-  if (!data || typeof data !== 'object') {
-    throw new Error('Invalid input: expected object');
-  }
-  // Process validated data
-}
-
-// ❌ No validation
-function processInput(data) {
-  return data.value; // Could crash if data is null/undefined
-}
-```
-
-### Logging (NEVER log secrets)
-```javascript
-// ✅ Safe logging
-logger.info('User authenticated', { userId: user.id });
-
-// ❌ Exposes secrets
-logger.info('Auth token', { token: user.token }); // WRONG!
-```
-
-## Agent Development Standards
-
-### Agent Categories (.opencode/agent/)
-- **core/**: Main user-facing agents (openagent, opencoder)
-- **meta/**: Meta-level agents (system-builder)
-- **subagents/**: Specialized helpers (task-manager, tester, reviewer, etc.)
-- **development/**: Domain specialists (frontend, backend, devops)
-- **content/**: Content creation (copywriter, technical-writer)
-
-### Context Loading Pattern
-Agents automatically load context before execution:
-- Code tasks → `.opencode/context/core/standards/code.md`
-- Docs tasks → `.opencode/context/core/standards/docs.md`
-- Tests tasks → `.opencode/context/core/standards/tests.md`
-- Review tasks → `.opencode/context/core/workflows/review.md`
-
-## MCP Integration Patterns
-
-### Trello MCP Usage
-```javascript
-// Agents can call Trello MCP functions:
-// - trello-mcp_get_lists
-// - trello-mcp_get_cards_by_list_id
-// - trello-mcp_add_card_to_list
-// - trello-mcp_update_card_details
-// - trello-mcp_move_card
-// - trello-mcp_archive_card
-```
-
-### GitHub MCP Usage
-```javascript
-// Agents can call GitHub MCP functions:
-// - github_create_pull_request
-// - github_list_issues
-// - github_create_or_update_file
-// - github_search_code
-// - github_merge_pull_request
-```
-
-## Pull Request Guidelines
-
-### PR Template
-**Location**: `.github/pull_request_template.md`
-
-**Required Sections**:
-- Feature Type (New Agent, Agent Enhancement, Documentation, Infrastructure)
-- Description (what changed and why)
-- Test Summary (how it was tested)
-- Screenshot (optional, for UI changes)
-
-### Review Checklist
-- ✅ No hardcoded credentials (use environment variables)
-- ✅ Agent YAML frontmatter complete (description, mode, tools)
-- ✅ Context files updated (if patterns changed)
-- ✅ Commands follow markdown structure
-- ✅ Security best practices followed
-- ✅ Documentation updated
-
-## Quick Reference
-
-### Starting Development
-```bash
-# Universal agent (general tasks, questions, coordination)
-opencode --agent openagent
-
-# Development specialist (complex coding, refactoring)
-opencode --agent opencoder
-
-# System builder (generate custom AI systems)
-opencode --agent system-builder
-
-# Use commands
-/commit          # Smart git commits
-/test            # Run tests
-/optimize        # Code optimization
-/clean           # Cleanup operations
-/context         # Context management
-/validate-repo   # Validate repository structure
-```
-
-### Common Patterns
-```javascript
-// Pure function pattern (from code.md)
-const add = (a, b) => a + b;
-const formatUser = (user) => ({ ...user, fullName: `${user.firstName} ${user.lastName}` });
-
-// Immutability pattern
-const addItem = (items, item) => [...items, item];
-const updateUser = (user, changes) => ({ ...user, ...changes });
-
-// Error handling pattern
-function parseJSON(text) {
-  try {
-    return { success: true, data: JSON.parse(text) };
-  } catch (error) {
-    return { success: false, error: error.message };
-  }
-}
-```
-
-### Environment Variables
-```bash
-# Required for MCP servers
-TRELLO_API_KEY=your_api_key
-TRELLO_TOKEN=your_token
-TRELLO_WORKSPACE_ID=your_workspace_id
-GITHUB_PERSONAL_ACCESS_TOKEN=your_github_token
-
-# Optional for plugins/tools
-GEMINI_API_KEY=your_gemini_key
-TELEGRAM_BOT_TOKEN=your_bot_token
-TELEGRAM_CHAT_ID=your_chat_id
-```
-
-## Additional Resources
-
-- **OpenAgents README**: `.opencode/README.md` - Complete framework documentation
-- **Essential Patterns**: `.opencode/context/core/essential-patterns.md` - Core coding patterns
-- **Code Standards**: `.opencode/context/core/standards/code.md` - Modular, functional, maintainable code
-- **OpenCode Docs**: https://opencode.ai/docs
-- **Trello API**: https://developer.atlassian.com/cloud/trello/rest/
-- **GitHub API**: https://docs.github.com/en/rest
+**Security:**
+- All credentials in .env (gitignored)
+- No hardcoded secrets (validated)
+- MCP servers use env var injection
+- Input validation on all external data
