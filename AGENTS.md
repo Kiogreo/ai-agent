@@ -1,181 +1,202 @@
-# AI AGENT DEVELOPMENT ENVIRONMENT
+# CODING AGENT GUIDE
 
-**Generated:** 2025-12-28  
-**Commit:** 8794fc8  
-**Branch:** main  
-**Type:** OpenCode CLI + Fitness Coaching Extension
+**Project:** OpenCode AI Agent Framework  
+**Stack:** TypeScript (Bun runtime), Markdown agents, MCP integrations  
+**Last Updated:** 2026-01-01
 
-## OVERVIEW
+This guide is for AI coding agents working in this repository. Follow these conventions strictly.
 
-OpenAgents framework for AI development with Trello/GitHub MCP integration. Extended with fitness coaching domain (bear aesthetic bodybuilding). Markdown-based agents, context-aware execution, approval-first workflows.
+---
 
-## STRUCTURE
+## 🚀 BUILD & TEST COMMANDS
 
-```
-./
-├── .opencode/          # Agent framework (66 .md files)
-│   ├── agent/          # 4 main + 17 subagents
-│   │   ├── core/       # openagent, opencoder (universal)
-│   │   ├── meta/       # system-builder (AI system generator)
-│   │   └── subagents/  # fitness/, code/, core/, system-builder/
-│   ├── command/        # 13 slash commands (+ fitness/ subdomain)
-│   ├── context/        # 21 context files
-│   │   ├── core/       # standards/, workflows/, system/
-│   │   ├── domain/     # fitness/ (NON-STANDARD)
-│   │   ├── processes/  # fitness/ workflows (NON-STANDARD)
-│   │   ├── standards/  # fitness/ standards (NON-STANDARD)
-│   │   └── templates/  # fitness/ templates (NON-STANDARD)
-│   ├── workflows/      # fitness/ workflows (NON-STANDARD)
-│   ├── tool/           # gemini/, env/ implementations
-│   └── plugin/         # telegram-notify implementation
-├── .github/            # PR template
-├── opencode.jsonc      # MCP config (Trello bunx, GitHub Docker)
-└── .env.example        # Credential template
-```
-
-## WHERE TO LOOK
-
-| Task | Location | Notes |
-|------|----------|-------|
-| Add new agent | `.opencode/agent/` or `subagents/` | YAML frontmatter required |
-| Add slash command | `.opencode/command/` | Markdown + YAML |
-| Define coding patterns | `.opencode/context/core/standards/` | Auto-loaded by agents |
-| Add domain knowledge | `.opencode/context/domain/{domain}/` | Fitness pattern |
-| Configure MCP | `opencode.jsonc` | bunx (Trello), Docker (GitHub) |
-| Fitness coaching | `.opencode/agent/fitness-coach.md` | Bear aesthetic focus |
-| System generation | `/build-context-system` | Interactive AI system builder |
-
-## CONVENTIONS (DEVIATIONS FROM STANDARD)
-
-**Non-Standard Structure:**
-- **domain/processes/standards/templates/** in context/ (standard: only core/project/)
-- **workflows/** directory (not in base OpenCode)
-- **Fitness-specific primary agents** in agent/ (fitness-coach, motivation-agent, progress-tracker)
-- **Domain subdirectories** in command/ (fitness/)
-- **tool/ and plugin/** with implementations (standard: optional, no implementations)
-
-**Context Loading Rules:**
-- Max 4 files per command (250-450 lines total)
-- NEVER execute code/docs/tests without loading standards first
-- ALWAYS load context before delegation
-- Files: 50-150 lines each (focused)
-
-**Agent Execution:**
-- NEVER auto-fix - always report → propose → approve → fix
-- NEVER implement entire plan at once - incremental only
-- ALWAYS request approval before write/edit/bash
-- STOP on test fail/errors (no auto-fix)
-
-**Security:**
-- NEVER hardcode credentials (use env vars)
-- NEVER log secrets (API keys, tokens)
-- ALWAYS validate input (prevent injection)
-- ALWAYS use ${env:VAR} in opencode.jsonc
-
-## ANTI-PATTERNS (THIS PROJECT)
-
-**Agent Development:**
-- **Skip approval gate** → ALWAYS request approval before execution
-- **Auto-fix errors** → Report → propose → approve → fix
-- **Execute without context** → Load standards FIRST (code.md, docs.md, tests.md)
-- **Batch implementation** → Incremental, one step at a time
-- **Skip LoadContext step** → MANDATORY before any code/docs/tests
-
-**Context Management:**
-- **Delete outside session** → ONLY delete tracked files, confirm first
-- **Exceed 4 file limit** → Max 4 context files (250-450 lines total)
-- **Generic advice** → Project-specific only
-- **Repeat parent content** → Child AGENTS.md NEVER repeats parent
-
-**MCP Integration:**
-- **Hardcode credentials** → Use TRELLO_API_KEY, GITHUB_PERSONAL_ACCESS_TOKEN env vars
-- **Skip input validation** → ALWAYS validate external data
-- **Log sensitive data** → NEVER log tokens/keys
-
-**Code Structure:**
-- **Mutation/side effects** → Pure functions only
-- **Deep nesting (>3 levels)** → Flatten
-- **Large functions (>50 lines)** → Split
-- **Global state** → Dependency injection
-- **Tight coupling** → Composition over inheritance
-
-## UNIQUE STYLES
-
-**Fitness Domain Integration:**
-- Bear aesthetic bodybuilding focus (stocky, muscular chub, strong belly)
-- Kink-aware motivational messaging
-- Liftosaur workout tracking integration
-- Privacy-first image/video analysis (temporary processing, never stored)
-- Domain-specific context structure (domain/processes/standards/templates/)
-
-**Agent Architecture:**
-- Hierarchical: orchestrator → subagents (manager-worker pattern)
-- Context-aware: auto-load standards before execution
-- Approval-first: plan → approve → execute → validate → summarize
-- Incremental: step-by-step with validation gates
-
-**MCP Configuration:**
-- Trello: bunx @delorenj/mcp-server-trello (local)
-- GitHub: Docker ghcr.io/github/github-mcp-server (containerized)
-- Environment variable injection: ${env:VAR_NAME}
-
-## COMMANDS
-
+### Setup & Development
 ```bash
-# Start agents
-opencode --agent openagent              # Universal (questions, tasks, coordination)
-opencode --agent opencoder              # Development (complex coding, refactoring)
-opencode --agent fitness-coach          # Fitness coaching (bear aesthetic)
-opencode --agent system-builder         # AI system generator
-
-# Slash commands
-/commit                                 # Smart git commits (conventional format)
-/test                                   # Testing workflows
-/optimize                               # Code optimization
-/clean                                  # Cleanup operations
-/context                                # Context management
-/validate-repo                          # Repository validation
-/build-context-system                   # Generate custom AI systems
-/track-progress                         # Fitness progress (Liftosaur integration)
-/analyze-form                           # Exercise form analysis (privacy-protected)
-/coach-me                               # Motivational coaching (kink-aware)
-/set-goal                               # Fitness goal setting
-
-# Development
-cd .opencode && bun install             # Install dependencies
-/validate-repo                          # Validate structure
+cd .opencode && bun install                    # Install dependencies
+bun run .opencode/tool/gemini/index.ts         # Run tool directly (no build step)
+bun run .opencode/plugin/notify.ts             # Run plugin directly
 ```
 
-## NOTES
+### Testing
+```bash
+bun test                                       # Run all tests
+bun test path/to/file.test.ts                 # Run single test file
+GEMINI_TEST_MODE=true bun test                # Test mode (mocks API calls)
+```
 
-**Fitness System:**
-- Fully integrated with existing OpenCode framework
-- Leverages image-specialist for visual analysis
-- Privacy-first: images processed temporarily, never stored
-- Liftosaur API integration for workout tracking
-- Bear aesthetic focus: chest/arms/shoulders/back priority, belly aesthetic maintenance
+### Validation
+```bash
+/validate-repo                                 # Comprehensive repo validation
+opencode --agent openagent                     # Start universal agent
+```
 
-**MCP Servers:**
-- Trello: Requires TRELLO_API_KEY, TRELLO_TOKEN, TRELLO_WORKSPACE_ID
-- GitHub: Requires GITHUB_PERSONAL_ACCESS_TOKEN
-- Both configured in opencode.jsonc with ${env:} references
+---
 
-**Context Loading:**
-- Agents auto-load context before execution
-- Code tasks → core/standards/code.md
-- Docs tasks → core/standards/docs.md
-- Tests tasks → core/standards/tests.md
-- Fitness tasks → domain/fitness/*.md
+## 📋 CODE STYLE GUIDELINES
 
-**Non-Obvious:**
-- package.json in .opencode/ (Node.js deps for plugins/tools)
-- Workflows directory (not in standard OpenCode)
-- Multiple README.md files (.opencode/, .opencode/plugin/, .opencode/tool/)
-- DEPENDENCIES.md and INDEX.md in .opencode/ (additional docs)
-- Domain-specific context structure (fitness pattern for future domains)
+### Core Philosophy: **Modular, Functional, Maintainable**
 
-**Security:**
-- All credentials in .env (gitignored)
-- No hardcoded secrets (validated)
-- MCP servers use env var injection
-- Input validation on all external data
+- ✅ Pure functions (no side effects) | ✅ Immutability | ✅ Small functions (< 50 lines) | ✅ Explicit dependencies
+- ❌ Mutation | ❌ Side effects | ❌ Deep nesting | ❌ Global state
+
+### File Naming
+```
+lowercase-with-dashes.ts        # TypeScript files
+lowercase-with-dashes.md        # Markdown files
+UPPER_CASE.md                   # Documentation (README, AGENTS)
+```
+
+### Import Organization
+```typescript
+// 1. Type imports first
+import type { Plugin } from "@opencode-ai/plugin"
+
+// 2. External dependencies
+import { tool } from "@opencode-ai/plugin/tool"
+import { readFile } from "fs/promises"
+
+// 3. Internal modules (relative imports)
+import { getApiKey } from "../env"
+
+// 4. Constants after imports
+const ENABLED = false
+```
+
+### TypeScript Conventions
+
+```typescript
+// ✅ Interfaces for object shapes
+interface ImageConfig {
+  outputDir?: string
+  useTimestamp?: boolean
+}
+
+// ✅ Types for unions/aliases
+type EventType = "session.idle" | "message.updated"
+
+// ✅ Explicit return types for public functions
+export async function generateImage(prompt: string, config: ImageConfig = {}): Promise<string>
+
+// ✅ Naming: verbPhrases (getApiKey, loadEnvVariables)
+// ✅ Predicates: is/has/can prefix (isTestMode, hasPermission)
+// ✅ Variables: camelCase (userCount, apiKey)
+// ✅ Constants: UPPER_SNAKE_CASE (DEFAULT_ENV_PATHS, ENABLED)
+```
+
+### Error Handling
+
+```typescript
+// ✅ Result pattern (preferred)
+function parseJSON(text: string) {
+  try {
+    return { success: true, data: JSON.parse(text) }
+  } catch (error) {
+    return { success: false, error: error.message }
+  }
+}
+
+// ✅ Helpful error messages with context
+async function getApiKey(apiKeyName: string): Promise<string> {
+  const value = await getEnvVariable(apiKeyName)
+  if (!value) {
+    throw new Error(`${apiKeyName} not found. Please set it in your environment or .env file.
+
+To fix this:
+1. Add to .env file: ${apiKeyName}=your_value_here
+2. Or export it: export ${apiKeyName}=your_value_here`)
+  }
+  return value
+}
+
+// ✅ Test mode pattern
+function isTestMode(): boolean {
+  return process.env.GEMINI_TEST_MODE === 'true'
+}
+```
+
+---
+
+## 🔒 SECURITY RULES
+
+```typescript
+// ✅ ALWAYS use environment variables for secrets
+const apiKey = await getApiKey('GEMINI_API_KEY')
+
+// ✅ Use ${env:VAR} in opencode.jsonc
+"TRELLO_API_KEY": "${env:TRELLO_API_KEY}"
+
+// ❌ NEVER hardcode credentials
+const apiKey = "sk-1234567890"  // FORBIDDEN
+
+// ❌ NEVER log secrets
+console.log(`API Key: ${apiKey}`)  // FORBIDDEN
+
+// ✅ Validate inputs at boundaries
+async function editImage(imagePath: string, prompt: string): Promise<string> {
+  if (!imagePath) throw new Error("imagePath is required")
+  if (!prompt) throw new Error("prompt is required")
+  
+  const fileExists = await Bun.file(imagePath).exists()
+  if (!fileExists) throw new Error(`File not found: ${imagePath}`)
+  // ...
+}
+```
+
+---
+
+## ❌ ANTI-PATTERNS TO AVOID
+
+```typescript
+// ❌ Mutation → ✅ Immutability
+const addItem = (items, item) => { items.push(item); return items }  // BAD
+const addItem = (items, item) => [...items, item]                    // GOOD
+
+// ❌ Side effects → ✅ Pure functions
+function calculateTotal(items) {
+  console.log('Calculating...')  // Side effect!
+  return items.reduce((sum, i) => sum + i.price, 0)
+}
+
+// ❌ Deep nesting → ✅ Early returns
+if (user) {
+  if (user.isActive) {
+    if (user.hasPermission) { /* ... */ }
+  }
+}
+// Better:
+if (!user) return null
+if (!user.isActive) return null
+if (!user.hasPermission) return null
+
+// ❌ Large functions → ✅ Small, focused functions (< 50 lines)
+```
+
+---
+
+## ⚡ QUICK REFERENCE
+
+### Golden Rules
+1. **Testability first** - If you can't easily test it, refactor it
+2. **Pure functions** > side effects
+3. **Explicit dependencies** > hidden imports
+4. **Small functions** (< 50 lines) > large functions
+5. **Environment variables** > hardcoded secrets
+
+### Pre-Commit Checklist
+- [ ] No hardcoded credentials
+- [ ] Functions < 50 lines
+- [ ] Explicit error handling
+- [ ] TypeScript types defined
+- [ ] YAML frontmatter (for agents)
+- [ ] No console.log of secrets
+
+### Context Files (Load Before Coding)
+- **Code tasks** → `.opencode/context/core/standards/code.md`
+- **Docs tasks** → `.opencode/context/core/standards/docs.md`
+- **Tests tasks** → `.opencode/context/core/standards/tests.md`
+
+### Bun-Specific Tips
+- Use `Bun.file()` for file operations (faster than fs)
+- Use `Bun.write()` for writing files
+- No build step needed - TypeScript runs directly
+- Test mode via environment variables (e.g., `GEMINI_TEST_MODE=true`)

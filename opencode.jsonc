@@ -4,27 +4,50 @@
   "model": "anthropic/claude-sonnet-4-5",
   "autoupdate": true,
   "mcp": {
-    "trello-mcp": {
-      "enabled": true,
-      "type": "local",
-      "command": ["bunx", "@delorenj/mcp-server-trello"],
-      "environment": {
-        "TRELLO_API_KEY": "${env:TRELLO_API_KEY}",
-        "TRELLO_TOKEN": "${env:TRELLO_TOKEN}",
-        "TRELLO_WORKSPACE_ID": "${env:TRELLO_WORKSPACE_ID}"
-      }
-    },
-    "github": {
+    "canva": {
       "enabled": true,
       "type": "local",
       "command": [
-        "docker", "run", "-i", "--rm",
-        "-e", "GITHUB_PERSONAL_ACCESS_TOKEN",
-        "ghcr.io/github/github-mcp-server"
-      ],
-      "environment": {
-        "GITHUB_PERSONAL_ACCESS_TOKEN": "${input:github_token}"
-      }
-    }
+        "npx",
+        "-y",
+        "mcp-remote@latest",
+        "https://mcp.canva.com/mcp"
+      ]
+    },
+    // "linkedin": {
+    //   "enabled": true,
+    //   "type": "local",
+    //   "command": [
+    //     "docker",
+    //     "run", "--rm", "-i",
+    //     "-e", "LINKEDIN_COOKIE",
+    //     "stickerdaniel/linkedin-mcp-server:latest"
+    //   ],
+    //   "environment": {
+    //     "LINKEDIN_COOKIE": "li_at=AQEDAT3olW4AI2W0AAABm3jNkAkAAAGbnNoUCVYAMErOVJQ04-pwNecNB6sb-y-EAC4ATjdkWKE4eTvNBTrHjQ-Ltomi8A-Io3GEfwutMRySvYeZCscd4eI8igdNmJX2zaCG25bLT8siQcYxjGEciTEI"
+    //   }
+    // },
+    // "trello": {
+    //   "enabled": true,
+    //   "type": "local",
+    //   "command": ["bunx", "@delorenj/mcp-server-trello"],
+    //   "environment": {
+    //     "TRELLO_API_KEY": "${env:TRELLO_API_KEY}",
+    //     "TRELLO_TOKEN": "${env:TRELLO_TOKEN}",
+    //     "TRELLO_WORKSPACE_ID": "${env:TRELLO_WORKSPACE_ID}"
+    //   }
+    // },
+    // "github": {
+    //   "enabled": true,
+    //   "type": "local",
+    //   "command": [
+    //     "docker", "run", "-i", "--rm",
+    //     "-e", "GITHUB_PERSONAL_ACCESS_TOKEN",
+    //     "ghcr.io/github/github-mcp-server"
+    //   ],
+    //   "environment": {
+    //     "GITHUB_PERSONAL_ACCESS_TOKEN": "${input:github_token}"
+    //   }
+    // }
   }
 }
