@@ -1,0 +1,35 @@
+{
+    "terminal.integrated.automationProfile.linux": {
+
+    },
+    "terminal.integrated.cursorBlinking": true,
+    "terminal.integrated.defaultProfile.linux": "zsh",
+    "terminal.integrated.enableVisualBell": true,
+    "terminal.integrated.env.linux": {
+
+    },
+    "terminal.integrated.gpuAcceleration": "auto",
+    "terminal.integrated.profiles.linux": {
+
+        "bash": {
+            "path": "bash",
+            "icon": "terminal-bash"
+        },
+        "zsh": {
+            "path": "zsh"
+        },
+        "fish": {
+            "path": "fish"
+        },
+        "tmux": {
+            "path": "tmux",
+            "icon": "terminal-tmux"
+        },
+        "pwsh": {
+            "path": "pwsh",
+            "icon": "terminal-powershell"
+        }
+    },
+    "terminal.integrated.suggest.enabled": true,
+    "terminal.integrated.tabs.defaultColor": null
+}
