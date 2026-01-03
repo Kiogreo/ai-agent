@@ -15,9 +15,10 @@ This repository provides a complete AI agent development environment powered by 
 ## ✨ Key Features
 
 - 🤖 **AI-Assisted Development** - Let agents write, test, and review code
+- 🎯 **Multi-Model Support** - Choose between Claude and GLM-4.6 based on task needs
 - 📋 **Trello MCP Integration** - Manage Trello boards through AI chat
 - 🔧 **GitHub MCP Integration** - Automate GitHub operations via AI
-- 📚 **Context Loading** - Agents automatically follow your coding patterns
+- 📚 **Context-Aware** - Agents automatically follow your coding patterns
 - 🔒 **Secure** - Credentials stored in environment variables
 - 🎨 **Customizable** - Add your own agents, commands, and patterns
 
@@ -52,15 +53,32 @@ This repository provides a complete AI agent development environment powered by 
 2. Generate new token with `repo`, `read:org`, `read:user` scopes
 3. Add to `.env` file
 
+### Get Ollama Cloud API Key (Optional)
+
+1. **Visit**: https://ollama.cloud and sign up/login
+2. **Navigate**: Account → API Keys
+3. **Generate**: Create new API key for cloud access
+4. **Copy**: Save the generated key for your `.env` file
+
+**Note**: Ollama Cloud provides GLM-4.6 as a secondary LLM model option alongside the default Claude model.
+
 ### Start Using Agents
 
 ```bash
 # Start the universal agent (recommended)
 opencode --agent openagent
 
-# Ask questions or request tasks
+# Use default model (Claude)
 > "Create a React component with TypeScript"
+
+# Use GLM-4.6 model (Ollama Cloud)
+opencode --model ollama-cloud/glm-4.6 --agent openagent
+> "Create a React component with TypeScript"
+
+# Add a card to my Trello board
 > "Add a card to my Trello board"
+
+# Review this code for security issues
 > "Review this code for security issues"
 ```
 
@@ -179,6 +197,25 @@ opencode --agent openagent
   "theme": "matrix",
   "model": "anthropic/claude-sonnet-4-5",
   "autoupdate": true,
+  "provider": {
+    "ollama-cloud": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "Ollama Cloud",
+      "options": {
+        "baseURL": "https://api.ollama.cloud/v1",
+        "apiKey": "${env:OLLAMA_CLOUD_API_KEY}"
+      },
+      "models": {
+        "glm-4.6": {
+          "name": "GLM-4.6",
+          "limit": {
+            "context": 128000,
+            "output": 8192
+          }
+        }
+      }
+    }
+  },
   "mcp": {
     "trello": {
       "enabled": true,
@@ -220,6 +257,9 @@ GITHUB_PERSONAL_ACCESS_TOKEN=your_github_token_here
 # Optional: Gemini AI (for image-specialist agent)
 GEMINI_API_KEY=your_gemini_key_here
 
+# Optional: Ollama Cloud API (secondary LLM model)
+OLLAMA_CLOUD_API_KEY=your_ollama_cloud_api_key_here
+
 # Optional: Telegram notifications
 TELEGRAM_BOT_TOKEN=your_bot_token_here
 TELEGRAM_CHAT_ID=your_chat_id_here
@@ -255,6 +295,22 @@ git add .
 # Auto-generates: ✨ feat: add user authentication system
 ```
 
+### Switch Between LLM Models
+
+```bash
+# Use default Claude model
+opencode --agent openagent
+> "Analyze this code for performance issues"
+
+# Use GLM-4.6 model (Ollama Cloud)
+opencode --model ollama-cloud/glm-4.6 --agent openagent
+> "Analyze this code for performance issues"
+
+# Compare model responses
+# Claude: Detailed analysis with step-by-step reasoning
+# GLM-4.6: Concise analysis with practical recommendations
+```
+
 ### Add Your Coding Patterns
 
 ```bash
@@ -270,6 +326,51 @@ nano .opencode/context/project/project-context.md
 # ```
 
 # Agents will automatically use these patterns!
+```
+
+## 🤖 Available LLM Models
+
+This project supports multiple LLM models for different use cases and preferences.
+
+### Primary Model: Claude Sonnet 4.5
+
+- **Provider**: Anthropic
+- **Strengths**: Complex reasoning, detailed analysis, step-by-step explanations
+- **Use Cases**: Architecture design, code review, complex problem-solving
+- **Configuration**: Default model, no additional setup required
+
+### Secondary Model: GLM-4.6 (Ollama Cloud)
+
+- **Provider**: Ollama Cloud
+- **Strengths**: Fast responses, concise outputs, practical recommendations
+- **Use Cases**: Quick code generation, straightforward tasks, performance-critical workflows
+- **Configuration**: Requires `OLLAMA_CLOUD_API_KEY` in `.env` file
+
+### Model Selection Guide
+
+| Task Type | Recommended Model | Reason |
+|-----------|------------------|--------|
+| Complex Architecture | Claude | Deep reasoning capabilities |
+| Code Review | Claude | Thorough analysis and explanations |
+| Quick Code Generation | GLM-4.6 | Faster response times |
+| Simple Questions | GLM-4.6 | Efficient and concise |
+| Learning/Tutorials | Claude | Detailed explanations |
+| Production Debugging | GLM-4.6 | Quick, actionable insights |
+
+### Usage Examples
+
+```bash
+# Default model (Claude) - best for complex tasks
+opencode --agent opencoder
+> "Design a microservices architecture for an e-commerce platform"
+
+# GLM-4.6 model - best for quick tasks
+opencode --model ollama-cloud/glm-4.6 --agent coder-agent
+> "Generate a TypeScript interface for user data"
+
+# Switch between models based on task complexity
+# Complex: Use Claude for thorough analysis
+# Simple: Use GLM-4.6 for speed
 ```
 
 ### Manage Trello with AI
@@ -402,6 +503,20 @@ Agents will automatically load and follow these patterns!
 - Check YAML frontmatter in agent files
 - Ensure patterns are clearly documented
 
+### "Ollama Cloud model not available" Error
+
+- Check `OLLAMA_CLOUD_API_KEY` is set in `.env` file
+- Verify API key is valid and active
+- Test connectivity: `curl -H "Authorization: Bearer $OLLAMA_CLOUD_API_KEY" https://api.ollama.cloud/v1/models`
+- Ensure model name is correct: `ollama-cloud/glm-4.6`
+
+### "GLM-4.6 model not responding"
+
+- Check Ollama Cloud service status
+- Verify API key permissions include GLM-4.6 access
+- Try switching back to Claude model: `opencode --model anthropic/claude-sonnet-4-5`
+- Check rate limits on your Ollama Cloud account
+
 ### Configuration errors
 
 - Validate JSON syntax in `opencode.jsonc`
@@ -425,6 +540,42 @@ Agents will automatically load and follow these patterns!
 3. Let agents delegate to specialists automatically
 4. Review and approve plans before execution
 5. Validate with `/test` and `/validate-repo`
+
+### Model Selection Workflow
+
+1. **Assess task complexity**: Simple vs. Complex
+2. **Choose model**: GLM-4.6 for speed, Claude for depth
+3. **Execute task**: Use appropriate model flag
+4. **Compare results**: Switch models if needed
+5. **Optimize**: Learn which model works best for each task type
+
+## 📊 Model Performance Comparison
+
+| Characteristic | Claude Sonnet 4.5 | GLM-4.6 (Ollama Cloud) |
+|---------------|-------------------|------------------------|
+| **Response Speed** | Medium | Fast |
+| **Reasoning Depth** | Very High | High |
+| **Code Quality** | Excellent | Very Good |
+| **Context Length** | 200K tokens | 128K tokens |
+| **Cost Efficiency** | Higher cost | Lower cost |
+| **Best For** | Complex problems | Quick tasks |
+| **Language Support** | Extensive | Strong |
+
+### When to Use Each Model
+
+**Use Claude when:**
+- Designing system architecture
+- Performing security analysis
+- Writing complex algorithms
+- Needing detailed explanations
+- Working with ambiguous requirements
+
+**Use GLM-4.6 when:**
+- Generating boilerplate code
+- Simple refactoring tasks
+- Quick documentation updates
+- Straightforward bug fixes
+- Performance-critical workflows
 
 ## 🤝 Contributing
 
