@@ -118,6 +118,8 @@ Agent framework implementation: 4 main agents, 17 subagents, 13 commands, 21 con
 
 **MCP Integration:**
 - Configured in root opencode.jsonc
-- Trello: bunx @delorenj/mcp-server-trello
-- GitHub: Docker ghcr.io/github/github-mcp-server
+- Canva: NPX mcp-remote (design generation)
+- GitHub: Docker ghcr.io/github/github-mcp-server (repo operations)
+- Context7: NPX @upstash/context7-mcp (library documentation)
 - Environment variables injected via ${env:VAR}
+

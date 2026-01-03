@@ -74,6 +74,7 @@ WHY THIS MATTERS:
 - Delegation without workflows/delegation.md → Wrong context passed to subagents
 
 Required context files:
+- Agent rules → .opencode/context/core/system/agent-rules.md (ALWAYS load first)
 - Code tasks → .opencode/context/core/standards/code.md
 - Docs tasks → .opencode/context/core/standards/docs.md  
 - Tests tasks → .opencode/context/core/standards/tests.md
@@ -84,6 +85,18 @@ CONSEQUENCE OF SKIPPING: Work that doesn't match project standards = wasted effo
 </critical_context_requirement>
 
 <critical_rules priority="absolute" enforcement="strict">
+  <rule id="context7_api_learning" scope="all_agents" priority="high">
+    When user asks to learn, understand, or get documentation for any API/library/framework:
+    - ALWAYS use Context7 MCP server FIRST before providing answers
+    - Query Context7 for official documentation
+    - Use Context7 results as primary source
+    - Cite Context7 in response
+    - Supplement with general knowledge only if Context7 lacks info
+    
+    Trigger phrases: "How do I use X?", "Show me X docs", "Explain X", "Learn about X", "Understand X"
+    Exceptions: Internal project code (use codebase), custom libraries (use project docs)
+  </rule>
+  
   <rule id="approval_gate" scope="all_execution">
     Request approval before ANY execution (bash, write, edit, task). Read/list ops don't require approval.
   </rule>
@@ -171,6 +184,15 @@ task(
   <stage id="1" name="Analyze" required="true">
     Assess req type→Determine path (conversational|task)
     <criteria>Needs bash/write/edit/task? → Task path | Purely info/read-only? → Conversational path</criteria>
+    
+    Check for API/library learning triggers:
+    - "How do I use [library]?"
+    - "Show me [API] documentation"
+    - "Explain [framework]"
+    - "Learn about [technology]"
+    - "Understand [package]"
+    
+    IF API/library learning detected → Use Context7 MCP (Rule: context7_api_learning)
   </stage>
 
   <stage id="2" name="Approve" when="task_path" required="true" enforce="@approval_gate">
@@ -182,11 +204,12 @@ task(
   <stage id="3" name="Execute" when="approved">
     <prerequisites>User approval received (Stage 2 complete)</prerequisites>
     
-    <step id="3.1" name="LoadContext" required="true" enforce="@critical_context_requirement">
+      <step id="3.1" name="LoadContext" required="true" enforce="@critical_context_requirement">
       ⛔ STOP. Before executing, check task type:
       
-      1. Classify task: docs|code|tests|delegate|review|patterns|bash-only
+      1. Classify task: api-learning|docs|code|tests|delegate|review|patterns|bash-only
       2. Map to context file:
+         - api-learning (learn/understand API/library) → Use Context7 MCP NOW (Rule: context7_api_learning)
          - code (write/edit code) → Read .opencode/context/core/standards/code.md NOW
          - docs (write/edit docs) → Read .opencode/context/core/standards/docs.md NOW
          - tests (write/edit tests) → Read .opencode/context/core/standards/tests.md NOW
@@ -195,6 +218,7 @@ task(
          - bash-only → No context needed, proceed to 3.2
       
       3. Apply context:
+         IF api-learning: Query Context7 MCP, use results as primary source, cite Context7
          IF delegating: Tell subagent "Load [context-file] before starting"
          IF direct: Use Read tool to load context file, then proceed to 3.2
       
