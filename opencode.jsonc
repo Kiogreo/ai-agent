@@ -15,13 +15,13 @@
       ]
     },
     "linkedin": {
-      "enabled": false,
+      "enabled": true,
       "type": "local",
       "command": [
-        "docker",
-        "run", "--rm", "-i",
-        "-e", "LINKEDIN_COOKIE",
-        "stickerdaniel/linkedin-mcp-server:latest"
+        "uvx",
+        "--from",
+        "git+https://github.com/stickerdaniel/linkedin-mcp-server",
+        "linkedin-mcp-server"
       ],
       "environment": {
         "LINKEDIN_COOKIE": "${env:LINKEDIN_COOKIE}"
@@ -55,6 +55,15 @@
       "command": ["npx", "-y", "@upstash/context7-mcp"],
       "environment": {
         "CONTEXT7_API_KEY": "${env:CONTEXT7_API_KEY}"
+      }
+    },
+    "argocd": {
+      "enabled": true,
+      "type": "local",
+      "command": ["npx", "argocd-mcp@latest", "stdio"],
+      "environment": {
+        "ARGOCD_BASE_URL": "${env:ARGOCD_BASE_URL}",
+        "ARGOCD_API_TOKEN": "${env:ARGOCD_API_TOKEN}"
       }
     }
   }
