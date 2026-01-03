@@ -5,7 +5,7 @@
   "autoupdate": true,
   "mcp": {
     "canva": {
-      "enabled": true,
+      "enabled": false,
       "type": "local",
       "command": [
         "npx",
@@ -14,29 +14,29 @@
         "https://mcp.canva.com/mcp"
       ]
     },
-    // "linkedin": {
-    //   "enabled": true,
-    //   "type": "local",
-    //   "command": [
-    //     "docker",
-    //     "run", "--rm", "-i",
-    //     "-e", "LINKEDIN_COOKIE",
-    //     "stickerdaniel/linkedin-mcp-server:latest"
-    //   ],
-    //   "environment": {
-    //     "LINKEDIN_COOKIE": "li_at=AQEDAT3olW4AI2W0AAABm3jNkAkAAAGbnNoUCVYAMErOVJQ04-pwNecNB6sb-y-EAC4ATjdkWKE4eTvNBTrHjQ-Ltomi8A-Io3GEfwutMRySvYeZCscd4eI8igdNmJX2zaCG25bLT8siQcYxjGEciTEI"
-    //   }
-    // },
-    // "trello": {
-    //   "enabled": true,
-    //   "type": "local",
-    //   "command": ["bunx", "@delorenj/mcp-server-trello"],
-    //   "environment": {
-    //     "TRELLO_API_KEY": "${env:TRELLO_API_KEY}",
-    //     "TRELLO_TOKEN": "${env:TRELLO_TOKEN}",
-    //     "TRELLO_WORKSPACE_ID": "${env:TRELLO_WORKSPACE_ID}"
-    //   }
-    // },
+    "linkedin": {
+      "enabled": false,
+      "type": "local",
+      "command": [
+        "docker",
+        "run", "--rm", "-i",
+        "-e", "LINKEDIN_COOKIE",
+        "stickerdaniel/linkedin-mcp-server:latest"
+      ],
+      "environment": {
+        "LINKEDIN_COOKIE": "${env:LINKEDIN_COOKIE}"
+      }
+    },
+    "trello": {
+      "enabled": false,
+      "type": "local",
+      "command": ["bunx", "@delorenj/mcp-server-trello"],
+      "environment": {
+        "TRELLO_API_KEY": "${env:TRELLO_API_KEY}",
+        "TRELLO_TOKEN": "${env:TRELLO_TOKEN}",
+        "TRELLO_WORKSPACE_ID": "${env:TRELLO_WORKSPACE_ID}"
+      }
+    },
     "github": {
       "enabled": true,
       "type": "local",

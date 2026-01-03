@@ -180,7 +180,7 @@ opencode --agent openagent
   "model": "anthropic/claude-sonnet-4-5",
   "autoupdate": true,
   "mcp": {
-    "trello-mcp": {
+    "trello": {
       "enabled": true,
       "type": "local",
       "command": ["bunx", "@delorenj/mcp-server-trello"],
