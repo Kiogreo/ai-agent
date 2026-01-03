@@ -108,16 +108,16 @@ The installer offers:
 # Essential - Minimal essentials (9 components)
 curl -fsSL https://raw.githubusercontent.com/darrenhinde/OpenAgents/main/install.sh | bash -s essential
 
-# Developer - Recommended for daily work (30 components)
+# Developer - Recommended for daily work (19 components)
 curl -fsSL https://raw.githubusercontent.com/darrenhinde/OpenAgents/main/install.sh | bash -s developer
 
 # Business - Business automation and content creation (15 components)
 curl -fsSL https://raw.githubusercontent.com/darrenhinde/OpenAgents/main/install.sh | bash -s business
 
-# Full - Everything included (36 components)
+# Full - Everything included (25 components)
 curl -fsSL https://raw.githubusercontent.com/darrenhinde/OpenAgents/main/install.sh | bash -s full
 
-# Advanced - Full + System Builder (43 components)
+# Advanced - Full + System Builder (32 components)
 curl -fsSL https://raw.githubusercontent.com/darrenhinde/OpenAgents/main/install.sh | bash -s advanced
 ```
 </details>
@@ -449,7 +449,7 @@ Minimal starter kit - universal agent with core subagents.
 - **Config**: env-example
 - **Best for**: Learning the system, lightweight tasks, minimal setup
 
-### 💼 Developer (Recommended - 30 components)
+### 💼 Developer (Recommended - 28 components)
 Complete software development environment with code generation, testing, review, and build tools.
 - Everything in Essential, plus:
 - **Agents**: opencoder
@@ -470,18 +470,23 @@ Business process automation, content creation, and visual workflows.
 - **Config**: env-example, readme
 - **Best for**: Business automation, content creation, non-developers
 
-### 📦 Full (36 components)
-Everything included - all agents, subagents, tools, and plugins.
-- Everything in Developer and Business combined, plus:
-- **Commands**: worktrees (git worktree management), validate-repo
+### 📦 Full (41 components)
+Everything included - all agents, subagents, commands, tools, and plugins.
+- Everything in Developer and Business combined (no duplicates), plus:
+- **Agents**: system-builder (meta)
+- **Subagents**: All code and system-builder subagents (9 total)
+- **Commands**: All commands including worktrees, prompt-enhancer, build-context-system (9 total)
+- **Tools**: env and gemini implementations (2 total)
+- **Plugins**: notify and telegram-notify implementations (2 total)
+- **Context**: All context files (12 total)
+- **Config**: env-example and readme
 - **Best for**: Power users, exploring all features
 
-### 🚀 Advanced (43 components)
+### 🚀 Advanced (41 components)
 Full installation plus **System Builder** for creating custom AI architectures.
-- Everything in Full, plus:
-- **Agents**: system-builder
-- **System Builder Subagents**: domain-analyzer, agent-generator, context-organizer, workflow-designer, command-creator
-- **Commands**: build-context-system
+- Same as Full profile (System Builder subagents included in component count)
+- **System Builder Meta-Agent**: domain-analyzer, agent-generator, context-organizer, workflow-designer, command-creator subagents already counted
+- **Commands**: build-context-system (already counted in Full)
 - **Best for**: Building custom AI systems, contributors, learning the architecture
 
 ## Updating Components
