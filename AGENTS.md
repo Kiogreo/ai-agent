@@ -1,32 +1,28 @@
 # CODING AGENT GUIDE
 
 **Runtime:** Bun | **Language:** TypeScript | **Philosophy:** Modular, Functional, Secure  
-**Project Type:** OpenCode Plugin Development with MCP Integration
+**Project:** OpenCode Plugin Development with MCP Integration
 
 ---
 
-## 🚀 BUILD/LINT/TEST COMMANDS
+## 🚀 QUICK COMMANDS
 
-### Development
 ```bash
+# Development
 cd .opencode && bun install                    # Install dependencies
-bun run .opencode/tool/gemini/index.ts         # Run TypeScript directly (no build needed)
+bun run .opencode/tool/gemini/index.ts         # Run TypeScript directly
+bun --watch .opencode/tool/gemini/index.ts     # Watch mode
 bun tsc --noEmit                               # Type check only
-bun --watch .opencode/tool/gemini/index.ts     # Watch mode for development
-```
 
-### Testing
-```bash
+# Testing
 bun test                                       # Run all tests
 bun test path/to/file.test.ts                  # Run single test file
 bun test --test-name-pattern "pattern"         # Run tests matching pattern
-GEMINI_TEST_MODE=true bun test                 # Run with mocked API calls (no real API usage)
-```
+GEMINI_TEST_MODE=true bun test                 # Run with mocked API calls
 
-### Validation & Cleanup
-```bash
-/validate-repo    # Validate repository structure and configuration
-/clean            # Cleanup operations
+# Validation
+/validate-repo                                 # Validate repository structure
+/clean                                         # Cleanup operations
 opencode --agent openagent                     # Start universal agent
 ```
 
@@ -45,31 +41,25 @@ const ENABLED = false                                // 4. Constants
 ### Naming Conventions
 - **Files**: `lowercase-with-dashes.ts`
 - **Functions**: `verbPhrases` (getApiKey, loadEnvVariables, parseJSON)
-- **Predicates**: `is/has/can` prefix (isTestMode, hasPermission)
-- **Variables**: `camelCase` (userCount, apiKey)
+- **Predicates**: `is/has/can` prefix (isTestMode, hasPermission, canAccess)
+- **Variables**: `camelCase` (userCount, apiKey, imageConfig)
 - **Constants**: `UPPER_SNAKE_CASE` (DEFAULT_ENV_PATHS, ENABLED)
+- **Interfaces**: `PascalCase` (ImageConfig, EnvLoaderConfig)
 
 ### Type Definitions
 ```typescript
+// Always define interfaces for config objects
 interface ImageConfig {
   outputDir?: string
   useTimestamp?: boolean
 }
 
+// Use explicit return types for public functions
 export async function generateImage(prompt: string, config: ImageConfig = {}): Promise<string>
 ```
 
 ### Error Handling
 ```typescript
-// ✅ Result pattern (preferred)
-function parseJSON(text: string) {
-  try {
-    return { success: true, data: JSON.parse(text) }
-  } catch (error) {
-    return { success: false, error: error.message }
-  }
-}
-
 // ✅ Helpful error messages with actionable steps
 async function getApiKey(name: string): Promise<string> {
   const value = await getEnvVariable(name)
@@ -87,6 +77,15 @@ To fix this:
 if (!user) return null
 if (!user.isActive) return null
 return processUser(user)
+
+// ✅ Try-catch in tool execute functions
+async execute(args, context) {
+  try {
+    return await generateImage(args.prompt, config)
+  } catch (error) {
+    return `Error: ${error.message}`
+  }
+}
 ```
 
 ---
@@ -108,48 +107,43 @@ function isTestMode(): boolean {
   return process.env.GEMINI_TEST_MODE === 'true'
 }
 
-if (isTestMode()) {
-  return mockResponse()
+async function callExternalAPI() {
+  if (isTestMode()) {
+    return mockResponse()  // Return mock data
+  }
+  return await actualApiCall()  // Real API call
 }
-return await actualApiCall()
 ```
 
 ---
 
 ## 🎯 CORE PATTERNS
 
-### Pure Functions (no side effects)
+### Pure Functions & Immutability
 ```typescript
-// ✅ Pure
+// ✅ Pure function
 const add = (a: number, b: number) => a + b
-const formatUser = (user: User) => ({ ...user, fullName: `${user.firstName} ${user.lastName}` })
 
-// ❌ Impure
-let total = 0
-const addToTotal = (value: number) => { total += value; return total }
-```
-
-### Immutability (don't modify, create new)
-```typescript
-// ✅ Immutable
+// ✅ Immutable operations
 const addItem = (items: Item[], item: Item) => [...items, item]
 const updateUser = (user: User, changes: Partial<User>) => ({ ...user, ...changes })
 
-// ❌ Mutable
+// ❌ Avoid mutation
 const addItem = (items: Item[], item: Item) => { items.push(item); return items }
 ```
 
 ### Small Functions (< 50 lines)
 ```typescript
 // ✅ Break into focused functions
-function validateOrder(order: Order) { /* ... */ }
-function calculateTotal(order: Order) { /* ... */ }
-function processPayment(order: Order) { /* ... */ }
-
-function processOrder(order: Order) {
-  validateOrder(order)
-  const total = calculateTotal(order)
-  return processPayment(order)
+async function getUniqueFilename(directory: string, baseName: string, extension: string): Promise<string> {
+  await ensureDirectoryExists(directory)
+  const baseFilename = join(directory, `${baseName}${extension}`)
+  const fileExists = await Bun.file(baseFilename).exists()
+  
+  if (!fileExists) return baseFilename
+  
+  const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5)
+  return join(directory, `${baseName}_${timestamp}${extension}`)
 }
 ```
 
@@ -163,6 +157,7 @@ const file = Bun.file(path)
 const content = await file.text()           // Read
 await Bun.write(path, content)              // Write
 const exists = await Bun.file(path).exists() // Check existence
+const stats = await Bun.file(path).stat()   // Get file stats
 ```
 
 ### Tool Definition Pattern
@@ -186,25 +181,6 @@ export const myTool = tool({
 })
 ```
 
-### Plugin Definition Pattern
-```typescript
-import type { Plugin } from "@opencode-ai/plugin"
-
-const ENABLED = false  // Feature flag
-
-export const MyPlugin: Plugin = async ({ $ }) => {
-  if (!ENABLED) return {}
-  
-  return {
-    async event(input) {
-      if (input.event.type === "session.idle") {
-        // Handle event
-      }
-    },
-  }
-}
-```
-
 ### Environment Variable Loading
 ```typescript
 import { getApiKey, getEnvVariable } from "../env"
@@ -218,17 +194,22 @@ const value = await getEnvVariable('OPTIONAL_VAR')
 // Automatically searches: ./.env, ../.env, ../../.env, ../plugin/.env
 ```
 
-### Test Mode Pattern (for API calls)
+### Test Mode Pattern
 ```typescript
 function isTestMode(): boolean {
   return process.env.GEMINI_TEST_MODE === 'true'
 }
 
-async function callExternalAPI() {
+async function generateImage(prompt: string, config: ImageConfig = {}): Promise<string> {
+  const apiKey = await getGeminiApiKey()
+  
   if (isTestMode()) {
-    return mockResponse()  // Return mock data
+    return `[TEST MODE] Would generate image for prompt: "${prompt}"`
   }
-  return await actualApiCall()  // Real API call
+  
+  // Real API call
+  const res = await fetch(apiUrl, { headers: { "x-goog-api-key": apiKey } })
+  // ...
 }
 ```
 
@@ -238,48 +219,26 @@ async function callExternalAPI() {
 
 ### AAA Pattern (Arrange-Act-Assert)
 ```typescript
-test('calculateTotal returns sum of item prices', () => {
-  // Arrange - Set up test data
-  const items = [{ price: 10 }, { price: 20 }, { price: 30 }]
+test('getUniqueFilename adds timestamp when file exists', async () => {
+  // Arrange
+  const directory = '/tmp/test'
+  const baseName = 'image'
+  const extension = '.png'
   
-  // Act - Execute code
-  const result = calculateTotal(items)
+  // Act
+  const result = await getUniqueFilename(directory, baseName, extension)
   
-  // Assert - Verify result
-  expect(result).toBe(60)
+  // Assert
+  expect(result).toMatch(/image_\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}\.png/)
 })
 ```
 
 ### What to Test
 - ✅ Happy path (normal usage)
-- ✅ Edge cases (boundaries, empty, null, undefined)
-- ✅ Error cases (invalid input, failures)
+- ✅ Edge cases (empty, null, undefined)
+- ✅ Error cases (invalid input, API failures)
 - ✅ Business logic (core functionality)
 - ❌ Third-party libraries, framework internals
-- ❌ Simple getters/setters, private details
-
-### Test Naming
-```typescript
-// ✅ Good: Descriptive, clear expectation
-test('validateEmail returns false for invalid format', () => {})
-test('createUser throws error when email exists', () => {})
-
-// ❌ Bad: Vague, unclear
-test('it works', () => {})
-```
-
----
-
-## ❌ ANTI-PATTERNS (AVOID)
-
-| Don't | Do |
-|-------|-----|
-| Mutation | Immutability |
-| Side effects | Pure functions |
-| Deep nesting | Early returns |
-| Large functions (>50 lines) | Small, focused functions |
-| Hardcoded credentials | Environment variables |
-| Hidden dependencies | Dependency injection |
 
 ---
 
@@ -302,6 +261,7 @@ test('it works', () => {})
 - Files: `lowercase-with-dashes.ts`
 - Functions: `verbPhrases` (getUser, validateEmail)
 - Constants: `UPPER_SNAKE_CASE`
+- Interfaces: `PascalCase`
 
 **Golden Rule:** If you can't easily test it, refactor it
 

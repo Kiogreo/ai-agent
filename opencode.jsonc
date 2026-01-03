@@ -3,25 +3,6 @@
   "theme": "matrix",
   "model": "anthropic/claude-sonnet-4-5",
   "autoupdate": true,
-  "provider": {
-    "ollama-cloud": {
-      "npm": "@ai-sdk/openai-compatible",
-      "name": "Ollama Cloud",
-      "options": {
-        "baseURL": "https://api.ollama.cloud/v1",
-        "apiKey": "${env:OLLAMA_CLOUD_API_KEY}"
-      },
-      "models": {
-        "glm-4.6": {
-          "name": "GLM-4.6",
-          "limit": {
-            "context": 128000,
-            "output": 8192
-          }
-        }
-      }
-    }
-  },
   "mcp": {
     "canva": {
       "enabled": false,
