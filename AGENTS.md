@@ -1,225 +1,271 @@
-# PROJECT KNOWLEDGE BASE
+# CODING AGENT GUIDE
 
-**Generated:** 2026-01-03 08:15:00 +0800  
-**Commit:** f2cbf6c  
-**Branch:** main
+**Runtime:** Bun | **Language:** TypeScript | **Philosophy:** Modular, Functional, Secure  
+**Project:** OpenCode Plugin Development with MCP Integration
 
-## OVERVIEW
-OpenCode AI Agent Framework - Development environment with 21 agents, 13 commands, MCP integrations (GitHub), and intelligent code generation.
-
-## STRUCTURE
-```
-.
-├── .opencode/              # OpenAgents framework core
-│   ├── agent/              # 21 agents (4 main + 17 subagents)
-│   │   └── AGENTS.md       # Agent development guide
-│   ├── command/            # 13 slash commands
-│   │   └── AGENTS.md       # Command development guide
-│   ├── context/            # 21 context files (standards, workflows)
-│   │   └── AGENTS.md       # Context management guide
-│   ├── tool/               # env loader, Gemini AI
-│   │   └── AGENTS.md       # Tool development guide
-│   ├── plugin/             # Telegram notifications
-│   │   └── AGENTS.md       # Plugin development guide
-│   ├── workflows/          # Domain workflows (fitness)
-│   └── AGENTS.md           # Framework overview
-├── .input/                 # Input files for processing
-├── .output/                # Generated outputs
-├── openagent-install.sh    # Installer script
-├── opencode.jsonc          # OpenCode configuration
-├── .env.example            # Environment template
-└── AGENTS.md               # This file (project knowledge base)
-```
-
-**Note:** Each major directory contains an AGENTS.md file for domain-specific guidance.
-
-## WHERE TO LOOK
-
-| Task | Location | Notes |
-|------|----------|-------|
-| Create agent | `.opencode/agent/` | YAML + XML structure |
-| Add command | `.opencode/command/` | YAML + Markdown |
-| Define standards | `.opencode/context/core/standards/` | Auto-loaded |
-| Add domain | `.opencode/context/domain/{domain}/` | Follow fitness pattern |
-| Implement tool | `.opencode/tool/{name}/` | TypeScript (Bun) |
-| Add plugin | `.opencode/plugin/{name}/` | @opencode-ai/plugin |
-| Configure MCP | `opencode.jsonc` | GitHub integration |
-| Environment vars | `.env` | Credentials (gitignored) |
-
-## CONVENTIONS
-
-### File Naming
-```
-lowercase-with-dashes.ts        # TypeScript files
-lowercase-with-dashes.md        # Markdown files
-UPPER_CASE.md                   # Documentation (README, AGENTS)
-```
-
-### Code Style
-**Philosophy:** Modular, Functional, Maintainable
-
-```typescript
-// ✅ Pure functions, immutability, small (<50 lines)
-export async function getApiKey(name: string): Promise<string>
-
-// ✅ Explicit types, verb phrases, early returns
-if (!value) throw new Error(`${name} not found`)
-
-// ✅ Result pattern for error handling
-return { success: true, data: result }
-```
-
-### Agent Structure
-```yaml
 ---
-description: Brief purpose
-mode: chat | tool
-temperature: 0.7
-tools: [read, write, bash]
----
-<agent>
-  <context>What agent knows</context>
-  <role>Agent identity</role>
-  <task>Responsibilities</task>
-</agent>
-```
 
-### Command Structure
-```yaml
----
-description: Command purpose
-arguments:
-  - name: arg_name
-    type: string
-    required: false
----
-# Command workflow
-```
+## 🚀 QUICK COMMANDS
 
-## ANTI-PATTERNS (THIS PROJECT)
-
-**Code:**
-- ❌ Mutation → ✅ Immutability
-- ❌ Side effects → ✅ Pure functions
-- ❌ Deep nesting → ✅ Early returns
-- ❌ Large functions (>50 lines) → ✅ Small, focused
-- ❌ Hardcoded credentials → ✅ Environment variables
-
-**Agents:**
-- ❌ Generic orchestrators → ✅ Domain-specific focus
-- ❌ Monolithic agents → ✅ Split into subagents
-- ❌ Missing YAML tools → ✅ Always specify permissions
-
-**Context:**
-- ❌ Flat structure → ✅ Hierarchical (domain/processes/standards)
-- ❌ Large files (>150 lines) → ✅ Split into focused files
-- ❌ Duplicate standards → ✅ Don't repeat core/ in domain/
-
-## UNIQUE STYLES
-
-**Domain Pattern (Fitness example):**
-```
-.opencode/
-├── agent/subagents/fitness/     # 4 specialists
-├── command/fitness/             # 4 commands
-├── context/domain/fitness/      # 3 knowledge files
-├── context/processes/fitness/   # 2 workflows
-├── context/standards/fitness/   # 2 rules
-└── workflows/fitness/           # 2 workflow definitions
-```
-
-**Reusable for:** e-commerce, customer-support, data-analysis, etc.
-
-**Bun Runtime:**
 ```bash
-bun run .opencode/tool/gemini/index.ts  # Direct execution
-GEMINI_TEST_MODE=true bun test          # Test mode
+# Development
+cd .opencode && bun install                    # Install dependencies
+bun run .opencode/tool/gemini/index.ts         # Run TypeScript directly
+bun --watch .opencode/tool/gemini/index.ts     # Watch mode
+bun tsc --noEmit                               # Type check only
+
+# Testing
+bun test                                       # Run all tests
+bun test path/to/file.test.ts                  # Run single test file
+bun test --test-name-pattern "pattern"         # Run tests matching pattern
+GEMINI_TEST_MODE=true bun test                 # Run with mocked API calls
+
+# Validation
+/validate-repo                                 # Validate repository structure
+/clean                                         # Cleanup operations
+opencode --agent openagent                     # Start universal agent
 ```
 
-**MCP Integration:**
-```jsonc
-// opencode.jsonc
-"mcp": {
-  "canva": {
-    "enabled": true,
-    "command": ["npx", "-y", "mcp-remote@latest", "https://mcp.canva.com/mcp"]
-  },
-  "github": {
-    "enabled": true,
-    "command": ["docker", "run", "-i", "--rm", "-e", "GITHUB_PERSONAL_ACCESS_TOKEN", "ghcr.io/github/github-mcp-server"],
-    "environment": { "GITHUB_PERSONAL_ACCESS_TOKEN": "${env:GITHUB_PERSONAL_ACCESS_TOKEN}" }
-  },
-  "context7": {
-    "enabled": true,
-    "command": ["npx", "-y", "@upstash/context7-mcp"],
-    "environment": { "CONTEXT7_API_KEY": "${env:CONTEXT7_API_KEY}" }
+---
+
+## 📝 CODE STYLE
+
+### Import Order
+```typescript
+import type { Plugin } from "@opencode-ai/plugin"    // 1. Type imports
+import { tool } from "@opencode-ai/plugin/tool"      // 2. External deps
+import { getApiKey } from "../env"                   // 3. Internal modules
+const ENABLED = false                                // 4. Constants
+```
+
+### Naming Conventions
+- **Files**: `lowercase-with-dashes.ts`
+- **Functions**: `verbPhrases` (getApiKey, loadEnvVariables, parseJSON)
+- **Predicates**: `is/has/can` prefix (isTestMode, hasPermission, canAccess)
+- **Variables**: `camelCase` (userCount, apiKey, imageConfig)
+- **Constants**: `UPPER_SNAKE_CASE` (DEFAULT_ENV_PATHS, ENABLED)
+- **Interfaces**: `PascalCase` (ImageConfig, EnvLoaderConfig)
+
+### Type Definitions
+```typescript
+// Always define interfaces for config objects
+interface ImageConfig {
+  outputDir?: string
+  useTimestamp?: boolean
+}
+
+// Use explicit return types for public functions
+export async function generateImage(prompt: string, config: ImageConfig = {}): Promise<string>
+```
+
+### Error Handling
+```typescript
+// ✅ Helpful error messages with actionable steps
+async function getApiKey(name: string): Promise<string> {
+  const value = await getEnvVariable(name)
+  if (!value) {
+    throw new Error(`${name} not found. Please set it in your environment or .env file.
+
+To fix this:
+1. Add to .env file: ${name}=your_value_here
+2. Or export it: export ${name}=your_value_here`)
+  }
+  return value
+}
+
+// ✅ Early returns (avoid deep nesting)
+if (!user) return null
+if (!user.isActive) return null
+return processUser(user)
+
+// ✅ Try-catch in tool execute functions
+async execute(args, context) {
+  try {
+    return await generateImage(args.prompt, config)
+  } catch (error) {
+    return `Error: ${error.message}`
   }
 }
 ```
 
-## COMMANDS
+---
 
-```bash
-# Development
-/commit                    # Smart git commits (conventional + emoji)
-/clean                     # Prettier + ESLint + TypeScript
-/test                      # Run test pipeline
-/optimize                  # Performance + security analysis
+## 🔒 SECURITY (CRITICAL)
 
-# Validation
-/validate-repo             # Check repo consistency
+```typescript
+// ✅ ALWAYS use environment variables for secrets
+const apiKey = await getApiKey('GEMINI_API_KEY')
 
-# Context
-/context                   # Context management
-/build-context-system      # Generate custom AI systems
+// ❌ NEVER hardcode credentials
+const apiKey = "sk-1234567890"  // FORBIDDEN
 
-# Git
-/worktrees                 # Git worktree management
+// ❌ NEVER log secrets
+console.log(`API Key: ${apiKey}`)  // FORBIDDEN
 
-# AI
-/prompt-enhancer           # Improve prompts
+// ✅ Test mode pattern for API calls
+function isTestMode(): boolean {
+  return process.env.GEMINI_TEST_MODE === 'true'
+}
 
-# Setup
-cd .opencode && bun install           # Install dependencies
-opencode --agent openagent            # Start universal agent
+async function callExternalAPI() {
+  if (isTestMode()) {
+    return mockResponse()  // Return mock data
+  }
+  return await actualApiCall()  // Real API call
+}
 ```
 
-## NOTES
+---
 
-**Agent Hierarchy:**
+## 🎯 CORE PATTERNS
+
+### Pure Functions & Immutability
+```typescript
+// ✅ Pure function
+const add = (a: number, b: number) => a + b
+
+// ✅ Immutable operations
+const addItem = (items: Item[], item: Item) => [...items, item]
+const updateUser = (user: User, changes: Partial<User>) => ({ ...user, ...changes })
+
+// ❌ Avoid mutation
+const addItem = (items: Item[], item: Item) => { items.push(item); return items }
 ```
-User → Core Agent (openagent/opencoder) → Subagents → Response
+
+### Small Functions (< 50 lines)
+```typescript
+// ✅ Break into focused functions
+async function getUniqueFilename(directory: string, baseName: string, extension: string): Promise<string> {
+  await ensureDirectoryExists(directory)
+  const baseFilename = join(directory, `${baseName}${extension}`)
+  const fileExists = await Bun.file(baseFilename).exists()
+  
+  if (!fileExists) return baseFilename
+  
+  const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5)
+  return join(directory, `${baseName}_${timestamp}${extension}`)
+}
 ```
 
-**Context Loading:**
-- Agents auto-load: core/ → domain/ → processes/ → standards/
-- Max 4 files per agent (250-450 lines total)
-- Project-specific patterns override defaults
+---
 
-**Detailed Guides:**
-- TypeScript patterns → `.opencode/context/core/standards/typescript-patterns.md`
-- Code standards → `.opencode/context/core/standards/code.md`
-- Test patterns → `.opencode/context/core/standards/tests.md`
-- Documentation → `.opencode/context/core/standards/docs.md`
+## 🛠️ PROJECT-SPECIFIC PATTERNS
 
-**Security:**
-- All credentials in .env (gitignored)
-- Use ${env:VAR} in opencode.jsonc
-- Never hardcode secrets
-- Never log credentials
-
-**Quality Standards:**
-- Functions < 50 lines
-- Explicit TypeScript types
-- Pure functions preferred
-- Telegraphic documentation style
-
-**Backup:**
-- `.opencode.backup.20260102-213812/` - Previous framework version
-- Safe to delete after validation
-
-**Testing:**
-```bash
-bun test                              # All tests
-GEMINI_TEST_MODE=true bun test       # Mock API calls
+### Bun File Operations
+```typescript
+const file = Bun.file(path)
+const content = await file.text()           // Read
+await Bun.write(path, content)              // Write
+const exists = await Bun.file(path).exists() // Check existence
+const stats = await Bun.file(path).stat()   // Get file stats
 ```
+
+### Tool Definition Pattern
+```typescript
+import { tool } from "@opencode-ai/plugin/tool"
+
+export const myTool = tool({
+  description: "Brief description of what this tool does",
+  args: {
+    prompt: tool.schema.string().describe("Description of argument"),
+    optional: tool.schema.string().optional().describe("Optional argument"),
+  },
+  async execute(args, context) {
+    try {
+      // Implementation
+      return "Success message"
+    } catch (error) {
+      return `Error: ${error.message}`
+    }
+  },
+})
+```
+
+### Environment Variable Loading
+```typescript
+import { getApiKey, getEnvVariable } from "../env"
+
+// For required API keys
+const apiKey = await getApiKey('GEMINI_API_KEY')
+
+// For optional variables
+const value = await getEnvVariable('OPTIONAL_VAR')
+
+// Automatically searches: ./.env, ../.env, ../../.env, ../plugin/.env
+```
+
+### Test Mode Pattern
+```typescript
+function isTestMode(): boolean {
+  return process.env.GEMINI_TEST_MODE === 'true'
+}
+
+async function generateImage(prompt: string, config: ImageConfig = {}): Promise<string> {
+  const apiKey = await getGeminiApiKey()
+  
+  if (isTestMode()) {
+    return `[TEST MODE] Would generate image for prompt: "${prompt}"`
+  }
+  
+  // Real API call
+  const res = await fetch(apiUrl, { headers: { "x-goog-api-key": apiKey } })
+  // ...
+}
+```
+
+---
+
+## 🧪 TESTING STANDARDS
+
+### AAA Pattern (Arrange-Act-Assert)
+```typescript
+test('getUniqueFilename adds timestamp when file exists', async () => {
+  // Arrange
+  const directory = '/tmp/test'
+  const baseName = 'image'
+  const extension = '.png'
+  
+  // Act
+  const result = await getUniqueFilename(directory, baseName, extension)
+  
+  // Assert
+  expect(result).toMatch(/image_\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}\.png/)
+})
+```
+
+### What to Test
+- ✅ Happy path (normal usage)
+- ✅ Edge cases (empty, null, undefined)
+- ✅ Error cases (invalid input, API failures)
+- ✅ Business logic (core functionality)
+- ❌ Third-party libraries, framework internals
+
+---
+
+## ✅ PRE-COMMIT CHECKLIST
+
+- [ ] No hardcoded credentials or secrets
+- [ ] Functions < 50 lines
+- [ ] Explicit error handling with helpful messages
+- [ ] TypeScript types defined for public APIs
+- [ ] No console.log of sensitive data
+- [ ] Pure functions where possible
+- [ ] Early returns instead of deep nesting
+- [ ] Test mode support for external API calls
+
+---
+
+## 📚 QUICK REFERENCE
+
+**Naming:**
+- Files: `lowercase-with-dashes.ts`
+- Functions: `verbPhrases` (getUser, validateEmail)
+- Constants: `UPPER_SNAKE_CASE`
+- Interfaces: `PascalCase`
+
+**Golden Rule:** If you can't easily test it, refactor it
+
+**Context Files:**
+- `.opencode/context/core/standards/code.md` - Code standards
+- `.opencode/context/core/standards/typescript-patterns.md` - TypeScript patterns
+- `.opencode/context/core/standards/tests.md` - Test patterns

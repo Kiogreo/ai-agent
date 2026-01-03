@@ -108,16 +108,16 @@ The installer offers:
 # Essential - Minimal essentials (9 components)
 curl -fsSL https://raw.githubusercontent.com/darrenhinde/OpenAgents/main/install.sh | bash -s essential
 
-# Developer - Recommended for daily work (30 components)
+# Developer - Recommended for daily work (19 components)
 curl -fsSL https://raw.githubusercontent.com/darrenhinde/OpenAgents/main/install.sh | bash -s developer
 
 # Business - Business automation and content creation (15 components)
 curl -fsSL https://raw.githubusercontent.com/darrenhinde/OpenAgents/main/install.sh | bash -s business
 
-# Full - Everything included (36 components)
+# Full - Everything included (25 components)
 curl -fsSL https://raw.githubusercontent.com/darrenhinde/OpenAgents/main/install.sh | bash -s full
 
-# Advanced - Full + System Builder (43 components)
+# Advanced - Full + System Builder (32 components)
 curl -fsSL https://raw.githubusercontent.com/darrenhinde/OpenAgents/main/install.sh | bash -s advanced
 ```
 </details>

@@ -112,7 +112,6 @@ All context files follow these standards:
 
 - [OpenAgent Core](../agent/core/openagent.md) - Main agent that uses these context files
 - [OpenCoder](../agent/core/opencoder.md) - Development agent with context loading
-- [AGENTS.md](../../AGENTS.md) - Agent guidelines and context loading references
 
 ---
 
