@@ -1,23 +1,45 @@
 {
   "$schema": "https://opencode.ai/config.json",
   "theme": "matrix",
+  "default_agent": "OpenAgent",
   "autoupdate": true,
   "provider": {
     "ollama": {
       "npm": "@ai-sdk/openai-compatible",
       "name": "Ollama (local)",
       "options": {
-        "baseUrl": "http://localhost:11434/v1"
+        "baseURL": "http://localhost:11434/v1"
       },
       "models": {
-        "gpt-oss:latest": {
-          "name": "GPT-OSS"
+        "HammerAI/llama-3-lexi-uncensored": {
+          "name": "llama-3-lexi-uncensored",
+          "tool_call": true,
+          "reasoning": true,
+          "attachment": true
         },
-        "qwen3-coder": {
-          "name": "Qwen3 Coder"
+        "HammerAI/mythomax-l2": {
+          "name": "mythomax-l2",
+          "tool_call": true,
+          "reasoning": true,
+          "attachment": true
         },
-        "llama4": {
-          "name": "Llama 4"
+        "HammerAI/smart-lemon-cookie": {
+          "name": "smart-lemon-cookie",
+          "tool_call": true,
+          "reasoning": true,
+          "attachment": true
+        },
+        "HammerAI/mistral-nemo-uncensored": {
+          "name": "mistral-nemo-uncensored",
+          "tool_call": true,
+          "reasoning": true,
+          "attachment": true
+        },
+        "HammerAI/cydonia-v1.1": {
+          "name": "cydonia-v1.1",
+          "tool_call": true,
+          "reasoning": true,
+          "attachment": true
         }
       }
     }
