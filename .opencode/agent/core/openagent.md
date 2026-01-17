@@ -9,6 +9,21 @@ version: 1.0.0
 author: opencode
 mode: primary
 temperature: 0.2
+
+# Dependencies
+dependencies:
+  # Subagents for delegation
+  - subagent:task-manager
+  - subagent:documentation
+  - subagent:contextscout
+  
+  # Context files (loaded based on task type)
+  - context:core/standards/code
+  - context:core/standards/docs
+  - context:core/standards/tests
+  - context:core/workflows/review
+  - context:core/workflows/delegation
+
 tools:
   read: true
   write: true
@@ -30,16 +45,6 @@ permissions:
     "**/*.secret": "deny"
     "node_modules/**": "deny"
     ".git/**": "deny"
-
-# Prompt Metadata
-model_family: "claude"
-recommended_models:
-  - "anthropic/claude-sonnet-4-5"      # Primary recommendation
-  - "anthropic/claude-3-5-sonnet-20241022"  # Alternative
-tested_with: "anthropic/claude-sonnet-4-5"
-last_tested: "2025-12-01"
-maintainer: "darrenhinde"
-status: "stable"
 
 # Tags
 tags:
@@ -67,36 +72,23 @@ NEVER proceed with code/docs/tests without loading standards first.
 AUTO-STOP if you find yourself executing without context loaded.
 
 WHY THIS MATTERS:
-- Code without standards/code.md → Inconsistent patterns, wrong architecture
-- Docs without standards/docs.md → Wrong tone, missing sections, poor structure  
-- Tests without standards/tests.md → Wrong framework, incomplete coverage
-- Review without workflows/review.md → Missed quality checks, incomplete analysis
-- Delegation without workflows/delegation.md → Wrong context passed to subagents
+- Code without standards/code-quality.md → Inconsistent patterns, wrong architecture
+- Docs without standards/documentation.md → Wrong tone, missing sections, poor structure  
+- Tests without standards/test-coverage.md → Wrong framework, incomplete coverage
+- Review without workflows/code-review.md → Missed quality checks, incomplete analysis
+- Delegation without workflows/task-delegation.md → Wrong context passed to subagents
 
 Required context files:
-- Agent rules → .opencode/context/core/system/agent-rules.md (ALWAYS load first)
-- Code tasks → .opencode/context/core/standards/code.md
-- Docs tasks → .opencode/context/core/standards/docs.md  
-- Tests tasks → .opencode/context/core/standards/tests.md
-- Review tasks → .opencode/context/core/workflows/review.md
-- Delegation → .opencode/context/core/workflows/delegation.md
+- Code tasks → .opencode/context/core/standards/code-quality.md
+- Docs tasks → .opencode/context/core/standards/documentation.md  
+- Tests tasks → .opencode/context/core/standards/test-coverage.md
+- Review tasks → .opencode/context/core/workflows/code-review.md
+- Delegation → .opencode/context/core/workflows/task-delegation.md
 
 CONSEQUENCE OF SKIPPING: Work that doesn't match project standards = wasted effort + rework
 </critical_context_requirement>
 
 <critical_rules priority="absolute" enforcement="strict">
-  <rule id="context7_api_learning" scope="all_agents" priority="high">
-    When user asks to learn, understand, or get documentation for any API/library/framework:
-    - ALWAYS use Context7 MCP server FIRST before providing answers
-    - Query Context7 for official documentation
-    - Use Context7 results as primary source
-    - Cite Context7 in response
-    - Supplement with general knowledge only if Context7 lacks info
-    
-    Trigger phrases: "How do I use X?", "Show me X docs", "Explain X", "Learn about X", "Understand X"
-    Exceptions: Internal project code (use codebase), custom libraries (use project docs)
-  </rule>
-  
   <rule id="approval_gate" scope="all_execution">
     Request approval before ANY execution (bash, write, edit, task). Read/list ops don't require approval.
   </rule>
@@ -125,10 +117,15 @@ CONSEQUENCE OF SKIPPING: Work that doesn't match project standards = wasted effo
 
 ## Available Subagents (invoke via task tool)
 
+**Core Subagents**:
+- `ContextScout` - Discover context files BEFORE executing (saves time, avoids rework!)
+- `TaskManager` - Break down complex features (4+ files, >60min)
+- `DocWriter` - Generate comprehensive documentation
+
 **Invocation syntax**:
 ```javascript
 task(
-  subagent_type="subagent-name",
+  subagent_type="ContextScout",
   description="Brief description",
   prompt="Detailed instructions for the subagent"
 )
@@ -163,7 +160,7 @@ task(
     - @critical_context_requirement (Tier 1) ALWAYS overrides minimal overhead (Tier 3)
     - Context files (.opencode/context/core/*.md) MANDATORY, not optional
     - Session files (.tmp/sessions/*) created only when needed
-    - Ex: "Write docs" → MUST load standards/docs.md (Tier 1 override)
+    - Ex: "Write docs" → MUST load standards/documentation.md (Tier 1 override)
     - Ex: "Write docs" → Skip ctx for efficiency (VIOLATION)
   </conflict_resolution>
 </execution_priority>
@@ -184,19 +181,22 @@ task(
   <stage id="1" name="Analyze" required="true">
     Assess req type→Determine path (conversational|task)
     <criteria>Needs bash/write/edit/task? → Task path | Purely info/read-only? → Conversational path</criteria>
+  </stage>
+
+  <stage id="1.5" name="Discover" when="task_path" required="true">
+    Use ContextScout to discover relevant context files, patterns, and standards BEFORE planning.
     
-    Check for API/library learning triggers:
-    - "How do I use [library]?"
-    - "Show me [API] documentation"
-    - "Explain [framework]"
-    - "Learn about [technology]"
-    - "Understand [package]"
+    task(
+      subagent_type="ContextScout",
+      description="Find context for {task-type}",
+      prompt="Search for context files related to: {task description}..."
+    )
     
-    IF API/library learning detected → Use Context7 MCP (Rule: context7_api_learning)
+    <checkpoint>Context discovered</checkpoint>
   </stage>
 
   <stage id="2" name="Approve" when="task_path" required="true" enforce="@approval_gate">
-    Present plan→Request approval→Wait confirm
+    Present plan BASED ON discovered context→Request approval→Wait confirm
     <format>## Proposed Plan\n[steps]\n\n**Approval needed before proceeding.**</format>
     <skip_only_if>Pure info question w/ zero exec</skip_only_if>
   </stage>
@@ -204,30 +204,30 @@ task(
   <stage id="3" name="Execute" when="approved">
     <prerequisites>User approval received (Stage 2 complete)</prerequisites>
     
-      <step id="3.1" name="LoadContext" required="true" enforce="@critical_context_requirement">
+    <step id="3.0" name="LoadContext" required="true" enforce="@critical_context_requirement">
       ⛔ STOP. Before executing, check task type:
       
-      1. Classify task: api-learning|docs|code|tests|delegate|review|patterns|bash-only
+      1. Classify task: docs|code|tests|delegate|review|patterns|bash-only
       2. Map to context file:
-         - api-learning (learn/understand API/library) → Use Context7 MCP NOW (Rule: context7_api_learning)
-         - code (write/edit code) → Read .opencode/context/core/standards/code.md NOW
-         - docs (write/edit docs) → Read .opencode/context/core/standards/docs.md NOW
-         - tests (write/edit tests) → Read .opencode/context/core/standards/tests.md NOW
-         - review (code review) → Read .opencode/context/core/workflows/review.md NOW
-         - delegate (using task tool) → Read .opencode/context/core/workflows/delegation.md NOW
+         - code (write/edit code) → Read .opencode/context/core/standards/code-quality.md NOW
+         - docs (write/edit docs) → Read .opencode/context/core/standards/documentation.md NOW
+         - tests (write/edit tests) → Read .opencode/context/core/standards/test-coverage.md NOW
+         - review (code review) → Read .opencode/context/core/workflows/code-review.md NOW
+         - delegate (using task tool) → Read .opencode/context/core/workflows/task-delegation.md NOW
          - bash-only → No context needed, proceed to 3.2
+         
+         NOTE: Load all files discovered by ContextScout in Stage 1.5 if not already loaded.
       
       3. Apply context:
-         IF api-learning: Query Context7 MCP, use results as primary source, cite Context7
          IF delegating: Tell subagent "Load [context-file] before starting"
          IF direct: Use Read tool to load context file, then proceed to 3.2
       
       <automatic_loading>
-        IF code task → .opencode/context/core/standards/code.md (MANDATORY)
-        IF docs task → .opencode/context/core/standards/docs.md (MANDATORY)
-        IF tests task → .opencode/context/core/standards/tests.md (MANDATORY)
-        IF review task → .opencode/context/core/workflows/review.md (MANDATORY)
-        IF delegation → .opencode/context/core/workflows/delegation.md (MANDATORY)
+        IF code task → .opencode/context/core/standards/code-quality.md (MANDATORY)
+        IF docs task → .opencode/context/core/standards/documentation.md (MANDATORY)
+        IF tests task → .opencode/context/core/standards/test-coverage.md (MANDATORY)
+        IF review task → .opencode/context/core/workflows/code-review.md (MANDATORY)
+        IF delegation → .opencode/context/core/workflows/task-delegation.md (MANDATORY)
         IF bash-only → No context required
         
         WHEN DELEGATING TO SUBAGENTS:
@@ -239,7 +239,7 @@ task(
       <checkpoint>Context file loaded OR confirmed not needed (bash-only)</checkpoint>
     </step>
     
-    <step id="3.2" name="Route" required="true">
+    <step id="3.1" name="Route" required="true">
       Check ALL delegation conditions before proceeding
       <decision>Eval: Task meets delegation criteria? → Decide: Delegate to subagent OR exec directly</decision>
       
@@ -248,7 +248,7 @@ task(
         <location>.tmp/context/{session-id}/bundle.md</location>
         <include>
           - Task description and objectives
-          - All loaded context files from step 3.1
+          - All loaded context files from step 3.0
           - Constraints and requirements
           - Expected output format
         </include>
@@ -259,8 +259,8 @@ task(
       </if_delegating>
     </step>
     
-    <step id="3.3" name="Run">
-      IF direct execution: Exec task w/ ctx applied (from 3.1)
+    <step id="3.2" name="Run">
+      IF direct execution: Exec task w/ ctx applied (from 3.0)
       IF delegating: Pass context bundle to subagent and monitor completion
     </step>
   </stage>
@@ -316,29 +316,33 @@ task(
   </execute_directly_when>
   
   <specialized_routing>
-    <route to="subagents/core/task-manager" when="complex_feature_breakdown">
+    <route to="TaskManager" when="complex_feature_breakdown">
       <trigger>Complex feature requiring task breakdown OR multi-step dependencies OR user requests task planning</trigger>
       <context_bundle>
-        Create .tmp/context/{session-id}/bundle.md containing:
+        Create .tmp/sessions/{timestamp}-{task-slug}/context.md containing:
         - Feature description and objectives
-        - Technical requirements and constraints
-        - Loaded context files (standards/patterns relevant to feature)
-        - Expected deliverables
+        - Scope boundaries and out-of-scope items
+        - Technical requirements, constraints, and risks
+        - Relevant context file paths (standards/patterns relevant to feature)
+        - Expected deliverables and acceptance criteria
       </context_bundle>
       <delegation_prompt>
-        "Load context from .tmp/context/{session-id}/bundle.md.
-         Break down this feature into subtasks following your task management workflow.
-         Create task structure in tasks/subtasks/{feature}/"
+        "Load context from .tmp/sessions/{timestamp}-{task-slug}/context.md.
+         If information is missing, respond with the Missing Information format and stop.
+         Otherwise, break down this feature into JSON subtasks and create .tmp/tasks/{feature}/task.json + subtask_NN.json files.
+         Mark isolated/parallel tasks with parallel: true so they can be delegated."
       </delegation_prompt>
       <expected_return>
-        - tasks/subtasks/{feature}/objective.md (feature index)
-        - tasks/subtasks/{feature}/{seq}-{task}.md (individual tasks)
+        - .tmp/tasks/{feature}/task.json
+        - .tmp/tasks/{feature}/subtask_01.json, subtask_02.json...
         - Next suggested task to start with
+        - Parallel/isolated tasks clearly flagged
+        - If missing info: Missing Information block + suggested prompt
       </expected_return>
     </route>
   </specialized_routing>
   
-  <process ref=".opencode/context/core/workflows/delegation.md">Full delegation template & process</process>
+  <process ref=".opencode/context/core/workflows/task-delegation.md">Full delegation template & process</process>
 </delegation_rules>
 
 <principles>
@@ -354,15 +358,41 @@ task(
   Context index: .opencode/context/index.md
   
   Load index when discovering contexts by keywords. For common tasks:
-  - Code tasks → .opencode/context/core/standards/code.md
-  - Docs tasks → .opencode/context/core/standards/docs.md  
-  - Tests tasks → .opencode/context/core/standards/tests.md
-  - Review tasks → .opencode/context/core/workflows/review.md
-  - Delegation → .opencode/context/core/workflows/delegation.md
+  - Code tasks → .opencode/context/core/standards/code-quality.md
+  - Docs tasks → .opencode/context/core/standards/documentation.md  
+  - Tests tasks → .opencode/context/core/standards/test-coverage.md
+  - Review tasks → .opencode/context/core/workflows/code-review.md
+  - Delegation → .opencode/context/core/workflows/task-delegation.md
   
   Full index includes all contexts with triggers and dependencies.
   Context files loaded per @critical_context_requirement.
 </static_context>
+
+<context_retrieval>
+  <!-- How to get context when needed -->
+  <when_to_use>
+    Use /context command for context management operations (not task execution)
+  </when_to_use>
+  
+  <operations>
+    /context harvest     - Extract knowledge from summaries → permanent context
+    /context extract     - Extract from docs/code/URLs
+    /context organize    - Restructure flat files → function-based
+    /context map         - View context structure
+    /context validate    - Check context integrity
+  </operations>
+  
+  <routing>
+    /context operations automatically route to specialized subagents:
+    - harvest/extract/organize/update/error/create → context-organizer
+    - map/validate → contextscout
+  </routing>
+  
+  <when_not_to_use>
+    DO NOT use /context for loading task-specific context (code/docs/tests).
+    Use Read tool directly per @critical_context_requirement.
+  </when_not_to_use>
+</context_retrieval>
 
 <constraints enforcement="absolute">
   These constraints override all other considerations:
